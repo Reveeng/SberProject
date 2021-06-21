@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">SberProject</string>
+    <string name="title_scan">Сканер</string>
+    <string name="title_lenta">Новости</string>
+    <string name="title_map">Карта</string>
+    <string name="lin1"><b>Как начать сортировать мусор?</b></string>
+    <string name="lin2">5 советов для сортировки мусора для начинающих</string>
+    <string name="lin3"><b>Сколько мусора производят россияне</b></string>
+    <string name="lin4">Отбросы и общество</string>
+    <string name="lin5"><b>Химическая жизнь мусора</b></string>
+    <string name="lin6">Что происходит с отходами, когда они попадают на свалку?</string>
+    <string name="lin7"><b>Как сортировать мусор дома. Краткая инструкция</b></string>
+    <string name="lin8">Расскажем, как ввести эту полезную привычку в повседневную жизнь</string>
+    <string name="lin9"><b>О чем наука экология?</b></string>
+    <string name="lin10">Интересно и просто расскажем, что такое экология и о чем эта наука?</string>
+    <string name="Komp"><b>Компоненты:</b> \n &#8226; \t бутылка - 1 PETE/РЕТ \n
+    &#8226; \t крышечка \n  &#8226; \t колечко \n &#8226; \t этикетка</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="instr"><b>Подготовка:</b>\n &#8226; \t Скрутите крышечку \n
+    &#8226; \t Снимите колечко \n  &#8226; \t Оторвите этикетку \n &#8226; \t Тщательно промойте бутылку от остатков пищи
+</string>
+    <string name="press"><u>Нажми, чтобы посмотреть куда сдать</u></string>
+</resources>

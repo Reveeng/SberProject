@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingFragment">
+
+    <Button
+        android:id="@+id/notifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="1dp"
+        android:layout_marginEnd="129dp"
+        android:text="Уведомления"
+        android:textColor="#000000"
+        app:backgroundTint="#00FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/bell_img"
+        app:layout_constraintTop_toTopOf="@id/bell_img" />
+
+    <Button
+        android:id="@+id/language"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="193dp"
+        android:text="Язык"
+        android:textColor="#000000"
+        app:backgroundTint="#00FFFFFF"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView3"
+        app:layout_constraintTop_toTopOf="@+id/imageView3"
+        app:rippleColor="#00FFFFFF" />
+
+    <Button
+        android:id="@+id/access"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="69dp"
+        android:layout_marginBottom="18dp"
+        android:text="Доступ приложения"
+        android:textColor="#000000"
+        app:backgroundTint="#00FFFFFF"
+        app:iconTint="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/terms"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageView4" />
+
+    <Button
+        android:id="@+id/terms"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="31dp"
+        android:layout_marginBottom="300dp"
+        android:text="Условия использования"
+        android:textColor="#000000"
+        app:backgroundTint="#00FFFFFF"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/terms_img" />
+
+    <ImageView
+        android:id="@+id/bell_img"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="193dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="193dp"
+        app:layout_constraintBottom_toBottomOf="@+id/terms"
+        app:layout_constraintEnd_toStartOf="@+id/notifications"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/bell" />
+
+    <ImageView
+        android:id="@+id/terms_img"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginEnd="9dp"
+        app:layout_constraintBottom_toBottomOf="@+id/terms"
+        app:layout_constraintEnd_toStartOf="@+id/terms"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/terms"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/terms" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="17dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="17dp"
+        app:layout_constraintBottom_toTopOf="@+id/access"
+        app:layout_constraintEnd_toStartOf="@+id/language"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/bell_img"
+        app:srcCompat="@drawable/language" />
+
+    <ImageView
+        android:id="@+id/imageView4"
+        android:layout_width="0dp"
+        android:layout_height="45dp"
+        android:layout_marginStart="69dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="9dp"
+        android:layout_marginBottom="66dp"
+        app:layout_constraintBottom_toBottomOf="@+id/terms"
+        app:layout_constraintEnd_toStartOf="@+id/access"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/language"
+        app:srcCompat="@drawable/key" />
+</androidx.constraintlayout.widget.ConstraintLayout>

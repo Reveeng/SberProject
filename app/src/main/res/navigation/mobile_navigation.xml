@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/navigation_lenta">
+
+    <fragment
+        android:id="@+id/navigation_lenta"
+        android:name="com.example.sberproject.ui.lenta.LentaFragment"
+        tools:layout="@layout/fragment_lenta" >
+        <action
+            android:id="@+id/action_navigation_lenta_to_navigation_account"
+            app:destination="@id/navigation_account" />
+        <action
+            android:id="@+id/action_navigation_lenta_to_navigation_setting2"
+            app:destination="@id/navigation_setting" />
+        <action
+            android:id="@+id/action_navigation_lenta_to_navigation_browser"
+            app:destination="@id/navigation_browser" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_maps"
+        android:name="com.example.sberproject.ui.map.MapsFragment"
+        tools:layout="@layout/fragment_maps" />
+    <fragment
+        android:id="@+id/navigation_scanner"
+        android:name="com.example.sberproject.ui.scan.ScannerFragment"
+        tools:layout="@layout/fragment_scanner" >
+        <action
+            android:id="@+id/action_navigation_scanner_to_firstInstructionFragment"
+            app:destination="@id/navigation_first_instruction" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_account"
+        android:name="com.example.sberproject.AccountFragment"
+        tools:layout="@layout/fragment_account" />
+    <fragment
+        android:id="@+id/navigation_setting"
+        android:name="com.example.sberproject.SettingFragment"
+        tools:layout="@layout/fragment_setting" />
+    <fragment
+        android:id="@+id/navigation_browser"
+        android:name="com.example.sberproject.browserFragment"
+        tools:layout="@layout/fragment_browser" />
+    <fragment
+        android:id="@+id/navigation_first_instruction"
+        android:name="com.example.sberproject.FirstInstructionFragment"
+        tools:layout="@layout/fragment_first_instruction" >
+        <action
+            android:id="@+id/action_navigation_first_instruction_to_navigation_maps"
+            app:destination="@id/navigation_maps" />
+    </fragment>
+</navigation>

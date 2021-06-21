@@ -1,0 +1,2 @@
+rootProject.name = "SberProject"
+include ':app'
