@@ -1,4 +1,4 @@
-package com.example.sberproject
+package com.example.sberproject.view.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,8 +6,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.example.sberproject.R
 import com.example.sberproject.databinding.FragmentFirstInstructionBinding
-import com.example.sberproject.databinding.FragmentLentaBinding
 
 class FirstInstructionFragment : Fragment() {
     private var _binding: FragmentFirstInstructionBinding? = null
