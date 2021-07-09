@@ -1,0 +1,5 @@
+package com.example.sberproject
+
+enum class TrashType {
+    PAPER, PLASTIC, FOOD_WASTE, CLOTHES, APPLIANCES, GLASS, METAL, LAMPS, HAZARDOUS_WASTE, PACKAGING, BATTERIES, TETRA_PACK, OTHER
+}
