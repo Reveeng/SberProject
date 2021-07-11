@@ -16,6 +16,8 @@ import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.example.sberproject.R
 import com.example.sberproject.Util
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -24,7 +26,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import java.util.*
 
@@ -36,12 +41,12 @@ class MapsFragment : Fragment() {
     private var map: GoogleMap? = null
     private var cameraPosition: CameraPosition? = null
 
-    lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var locationPermissionGranted = false
 
-    private var currentLocation: Location? = null
+//    private var currentLocation: Location? = null
     private var lastKnownLocation: Location? = null
     private var likelyPlaceNames: Array<String?> = arrayOfNulls(0)
     private var likelyPlaceAddresses: Array<String?> = arrayOfNulls(0)
@@ -52,7 +57,7 @@ class MapsFragment : Fragment() {
 //    lateinit var  locationCallback: LocationCallback
 //
 //    just an int that must be unique
-    private var PERMISSION_ID = 52
+    private var permissionId = 52
 
 //    private fun getLocationPermission() {
 //    /*
@@ -72,18 +77,18 @@ class MapsFragment : Fragment() {
 
 
     // function that checks the uses permission
-    fun fetchLocation() {
+    private fun fetchLocation() {
         val task: Task<Location> = fusedLocationProviderClient.lastLocation
         if (
             context?.let {
                 ActivityCompat.checkSelfPermission(
-                    it.getApplicationContext(),
+                    it.applicationContext,
                     android.Manifest.permission.ACCESS_FINE_LOCATION
                 )
             } != PackageManager.PERMISSION_GRANTED ||
             context?.let {
                 ActivityCompat.checkSelfPermission(
-                    it.getApplicationContext(),
+                    it.applicationContext,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             } != PackageManager.PERMISSION_GRANTED
@@ -94,7 +99,16 @@ class MapsFragment : Fragment() {
         }
         task.addOnSuccessListener {
             if (it != null) {
-                currentLocation = it
+                val current = LatLng(it.latitude, it.longitude)
+                viewModel.setCurrentLocation(current)
+//                currentLocation = it
+//                map?.run {
+//                    addMarker(
+//                        MarkerOptions().title("Your position")
+//                            .position(current)
+//                    )
+//                    moveCamera(CameraUpdateFactory.newLatLng(current))
+//                }
             }
         }
         //so if this function returns false, we need then to request the permission
@@ -109,7 +123,7 @@ class MapsFragment : Fragment() {
                 arrayOf(
                     android.Manifest.permission.ACCESS_FINE_LOCATION,
                     android.Manifest.permission.ACCESS_COARSE_LOCATION
-                ), PERMISSION_ID
+                ), permissionId
             )
         }
     }
@@ -186,11 +200,11 @@ class MapsFragment : Fragment() {
         var cityName: String = ""
         var countryName = ""
         val geoCoder = Geocoder(requireContext(), Locale.getDefault())
-        val Adress = geoCoder.getFromLocation(lat, long, 3)
+        val address = geoCoder.getFromLocation(lat, long, 3)
 
-        cityName = Adress.get(0).locality
-        countryName = Adress.get(0).countryName
-        Log.d("Debug:", "Your City: " + cityName + " ; your Country " + countryName)
+        cityName = address[0].locality
+        countryName = address[0].countryName
+        Log.d("Debug:", "Your City: $cityName ; your Country $countryName")
         return cityName
     }
 
@@ -200,7 +214,7 @@ class MapsFragment : Fragment() {
         grantResults: IntArray
     ) {
         //we use it just for debugging
-        if (requestCode == PERMISSION_ID) {
+        if (requestCode == permissionId) {
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d("Debug", "You have the Permission")
             }
@@ -216,31 +230,56 @@ class MapsFragment : Fragment() {
 
 //        var currPos = Location() currentLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
 
-        fetchLocation()
-        var currentPos = defaultLocation
-        currentLocation?.let{
-            currentPos = LatLng(it.latitude, it.longitude)
-        }
+
+//        fetchLocation()
+//        map = googleMap
+
+        viewModel.currentLocation.observe(viewLifecycleOwner, {
+            googleMap.run {
+                addMarker(
+                    MarkerOptions().title("Your position")
+                        .position(it)
+                )
+                moveCamera(CameraUpdateFactory.zoomTo(12.0F))
+                moveCamera(CameraUpdateFactory.newLatLng(it))
+            }
+        })
+
+        viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
+            googleMap.run {
+                recyclingPlaces.map {
+                    val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
+                        BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
+                    else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
+                    addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))
+                }
+            }
+        })
+
+//        var currentPos = defaultLocation
+//        currentLocation?.let{
+//            currentPos = LatLng(it.latitude, it.longitude)
+//        }
 
 //        val arrayOfMarkers: Array<Marker>
 
-        Util.recyclingPlaces.map {
-            val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
-                BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
-            else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
-            googleMap.addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))
-        }
+//        Util.recyclingPlaces.map {
+//            val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
+//                BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
+//            else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
+//            googleMap.addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))
+//        }
 
 //        fetchLocation()
 //        currentLocation?.let {
 //            currentPos = LatLng(it.latitude, it.longitude)
 //        }
 //
-        val curPos: Marker = googleMap.addMarker(
-            MarkerOptions()
-                .position(currentPos)
-                .title("Your position")
-        )
+//        val curPos: Marker = googleMap.addMarker(
+//            MarkerOptions()
+//                .position(currentPos)
+//                .title("Your position")
+//        )
 //        val nemus: Marker = googleMap.addMarker(
 //            MarkerOptions()
 //                .position(LatLng(56.8407395692402, 60.593118629081964))
@@ -270,21 +309,21 @@ class MapsFragment : Fragment() {
 //                )
 //        )
 
-        val line: Polyline = googleMap.addPolyline(
-            PolylineOptions()
-                .add(
-                    LatLng(56.83529218503051, 60.61094518304741),
-                    LatLng(56.833666581963925, 60.59570049330751),
-                    LatLng(56.839178319738956, 60.59400247705653),
-                    LatLng(56.83956076465086, 60.594364554036794),
-                    LatLng(56.840530518092145, 60.594152302007345),
-                    LatLng(56.84082417086563, 60.59406490411435),
-                    LatLng(56.84094709459853, 60.593877622915066),
-                    LatLng(56.8412202570042, 60.59330329390392),
-                    LatLng(56.84068758846683, 60.59330329390392)
-                )
-                .color(-65536)
-        )
+//        val line: Polyline = googleMap.addPolyline(
+//            PolylineOptions()
+//                .add(
+//                    LatLng(56.83529218503051, 60.61094518304741),
+//                    LatLng(56.833666581963925, 60.59570049330751),
+//                    LatLng(56.839178319738956, 60.59400247705653),
+//                    LatLng(56.83956076465086, 60.594364554036794),
+//                    LatLng(56.840530518092145, 60.594152302007345),
+//                    LatLng(56.84082417086563, 60.59406490411435),
+//                    LatLng(56.84094709459853, 60.593877622915066),
+//                    LatLng(56.8412202570042, 60.59330329390392),
+//                    LatLng(56.84068758846683, 60.59330329390392)
+//                )
+//                .color(-65536)
+//        )
 //        val t = arguments?.getSerializable(TRASH_TYPE) as TrashType
 //        if (t == TrashType.NONE){
 //
@@ -292,30 +331,37 @@ class MapsFragment : Fragment() {
 //        else{
 //
 //        }
-        if (arguments?.getBoolean("MyArg") == true) {
-            line.isVisible = true
-//            nemus.showInfoWindow()
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(14.0F))
-            googleMap.moveCamera(
-                CameraUpdateFactory.newLatLng(
-                    LatLng(
-                        56.83715334529192,
-                        60.5989840370588
-                    )
-                )
-            )
-        } else {
-            line.isVisible = false
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(13.0F))
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentPos))
-        }
+//        if (arguments?.getBoolean("MyArg") == true) {
+////            line.isVisible = true
+////            nemus.showInfoWindow()
+//            googleMap.moveCamera(CameraUpdateFactory.zoomTo(14.0F))
+//            googleMap.moveCamera(
+//                CameraUpdateFactory.newLatLng(
+//                    LatLng(
+//                        56.83715334529192,
+//                        60.5989840370588
+//                    )
+//                )
+//            )
+//        } else {
+////            line.isVisible = false
+////            googleMap.moveCamera(CameraUpdateFactory.zoomTo(13.0F))
+////            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentPos))
+//        }
     }
+
+    private lateinit var viewModel: MapsViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return MapsViewModel(Util.recyclingPlaces) as T
+            }
+        }).get(MapsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
@@ -329,6 +375,7 @@ class MapsFragment : Fragment() {
 //        requestPermission()
 //        getLastLocation()
 
+        fetchLocation()
         mapFragment?.getMapAsync(callback)
         if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
