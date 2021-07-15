@@ -59,4 +59,5 @@ dependencies {
     implementation 'com.google.android.gms:play-services-location:18.0.0'
     implementation 'com.budiyev.android:code-scanner:2.1.0'
 
+    implementation 'com.akexorcist:google-direction-library:1.2.1'
 }
