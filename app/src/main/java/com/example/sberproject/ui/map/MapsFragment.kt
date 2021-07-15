@@ -1,6 +1,7 @@
 package com.example.sberproject.ui.map
 
 //import android.provider.SettingsSlicesContract.KEY_CAMERA_POSITION
+
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.Geocoder
@@ -18,6 +19,8 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.akexorcist.googledirection.GoogleDirection
+import com.akexorcist.googledirection.util.execute
 import com.example.sberproject.R
 import com.example.sberproject.Util
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -33,6 +36,7 @@ import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import java.util.*
 
+
 class MapsFragment : Fragment() {
 //    companion object {
 //        const val TRASH_TYPE = "trash type"
@@ -46,7 +50,7 @@ class MapsFragment : Fragment() {
     var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var locationPermissionGranted = false
 
-//    private var currentLocation: Location? = null
+    //    private var currentLocation: Location? = null
     private var lastKnownLocation: Location? = null
     private var likelyPlaceNames: Array<String?> = arrayOfNulls(0)
     private var likelyPlaceAddresses: Array<String?> = arrayOfNulls(0)
@@ -101,14 +105,6 @@ class MapsFragment : Fragment() {
             if (it != null) {
                 val current = LatLng(it.latitude, it.longitude)
                 viewModel.setCurrentLocation(current)
-//                currentLocation = it
-//                map?.run {
-//                    addMarker(
-//                        MarkerOptions().title("Your position")
-//                            .position(current)
-//                    )
-//                    moveCamera(CameraUpdateFactory.newLatLng(current))
-//                }
             }
         }
         //so if this function returns false, we need then to request the permission
@@ -255,6 +251,20 @@ class MapsFragment : Fragment() {
                 }
             }
         })
+
+        viewModel.routeToNearbyRecyclingPlace.observe(viewLifecycleOwner, { (start, end) ->
+            GoogleDirection.withServerKey(getString(R.string.google_maps_key))
+                .from(start)
+                .to(end)
+                .execute(
+                    onDirectionSuccess = { direction ->
+                        direction?.let {
+                            Log.e("MapsFragment", it.errorMessage)
+                        }
+                    }
+                )
+        })
+
 
 //        var currentPos = defaultLocation
 //        currentLocation?.let{
