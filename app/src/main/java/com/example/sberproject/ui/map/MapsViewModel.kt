@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.example.sberproject.RecyclingPlace
+import com.example.sberproject.TrashType
 import com.google.android.gms.maps.model.LatLng
 
 class MapsViewModel(
@@ -35,13 +36,18 @@ class MapsViewModel(
         mutableRouteToNearbyRecyclingPlace.value = coordinates to nearbyRecyclingPlace.coordinates
     }
 
+    fun setTrashType(trashType: TrashType) {
+        mutableRecyclingPlaces.value =
+            recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+    }
+
     private fun getNearbyRecyclingPlace(start: LatLng): RecyclingPlace {
         val startLocation = Location(LocationManager.GPS_PROVIDER).apply {
             latitude = start.latitude
             longitude = start.longitude
         }
         var min: Pair<RecyclingPlace, Float>? = null
-        recyclingPlacesList.forEach {
+        mutableRecyclingPlaces.value?.forEach {
             val dist = Location(LocationManager.GPS_PROVIDER).apply {
                 latitude = it.coordinates.latitude
                 longitude = it.coordinates.longitude

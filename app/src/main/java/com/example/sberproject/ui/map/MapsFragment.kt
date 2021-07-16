@@ -166,14 +166,14 @@ class MapsFragment : Fragment() {
     private fun onDirectionSuccess(googleMap: GoogleMap, direction: Direction) {
         val route = direction.routeList[0]
         val directionPositionList = route.legList[0].directionPoint
-        googleMap.addPolyline(
-            DirectionConverter.createPolyline(
-                requireContext(),
-                directionPositionList,
-                5,
-                Color.RED
-            )
+        val line = DirectionConverter.createPolyline(
+            requireContext(),
+            directionPositionList,
+            10,
+            Color.parseColor("#67a9db")
         )
+        googleMap.addPolyline(line)
+        googleMap.addPolyline(line.width(5f).color(Color.parseColor("#aed6f5")))
         setCameraWithCoordinationBounds(googleMap, route)
     }
 
