@@ -31,6 +31,9 @@
 <!--        <action-->
 <!--            android:id="@+id/action_navigation_scanner_to_firstInstructionFragment"-->
 <!--            app:destination="@id/navigation_first_instruction" />-->
+        <action
+            android:id="@+id/action_navigation_scanner_to_navigation_first_instruction"
+            app:destination="@id/navigation_first_instruction" />
     </fragment>
     <fragment
         android:id="@+id/navigation_account"
@@ -42,7 +45,7 @@
         tools:layout="@layout/fragment_setting" />
     <fragment
         android:id="@+id/navigation_browser"
-        android:name="com.example.sberproject.view.fragments.browserFragment"
+        android:name="com.example.sberproject.view.fragments.BrowserFragment"
         tools:layout="@layout/fragment_browser" />
     <fragment
         android:id="@+id/navigation_first_instruction"
