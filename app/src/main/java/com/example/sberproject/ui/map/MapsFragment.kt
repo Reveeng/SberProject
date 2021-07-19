@@ -1,5 +1,6 @@
 package com.example.sberproject.ui.map
 
+import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
@@ -8,6 +9,7 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -23,45 +25,139 @@ import com.akexorcist.googledirection.model.Route
 import com.akexorcist.googledirection.util.DirectionConverter
 import com.akexorcist.googledirection.util.execute
 import com.example.sberproject.R
+import com.example.sberproject.TrashType
 import com.example.sberproject.Util
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 import java.util.*
 
 
 class MapsFragment : Fragment() {
-//    companion object {
-//        const val TRASH_TYPE = "trash type"
-//    }
+    companion object {
+        const val TRASH_TYPE = "trash type"
 
+        @JvmStatic
+        fun newInstance(trashType: TrashType) = MapsFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(TRASH_TYPE, trashType)
+            }
+        }
+    }
+
+    private var trashType: TrashType? = null
     private lateinit var viewModel: MapsViewModel
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
+    private var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var permissionId = 52
+    private val locationCallback by lazy {
+        object : LocationCallback() {
+            override fun onLocationResult(locationResult: LocationResult) {
+                viewModel.setCurrentPosition(
+                    LatLng(
+                        locationResult.lastLocation.latitude,
+                        locationResult.lastLocation.longitude
+                    )
+                )
+            }
+        }
+    }
+    private val locationRequest by lazy {
+        LocationRequest.create().apply {
+            interval = 5000
+            fastestInterval = 1000
+            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        }
+    }
 
-    private fun fetchLocation() {
-        val task: Task<Location> = fusedLocationProviderClient.lastLocation
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getSerializable(TRASH_TYPE)?.let {
+            trashType = it as TrashType
+        }
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                return MapsViewModel(Util.recyclingPlaces) as T
+            }
+        }).get(MapsViewModel::class.java)
+        return inflater.inflate(R.layout.fragment_maps, container, false)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.P)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
+
+//        requestPermission()
+//        getLastLocation()
+
+//        fetchLocation()
+
+        mapFragment?.getMapAsync(callback)
+//        trashType = TrashType.CLOTHES
+        trashType?.let {
+            viewModel.setTrashType(it)
+            fetchCurrentLocationAndFindNearbyRecyclingPlace()
+        }
+//        if (savedInstanceState != null) {
+//            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
+//            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
+//        }
+    }
+
+    override fun onResume() {
+        super.onResume()
         if (
             context?.let {
                 ActivityCompat.checkSelfPermission(
                     it.applicationContext,
-                    android.Manifest.permission.ACCESS_FINE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION
                 )
             } != PackageManager.PERMISSION_GRANTED ||
             context?.let {
                 ActivityCompat.checkSelfPermission(
                     it.applicationContext,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            } != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermission()
+            return
+        }
+        fusedLocationProviderClient.requestLocationUpdates(
+            locationRequest,
+            locationCallback,
+            Looper.getMainLooper()
+        )
+    }
+
+    private fun fetchCurrentLocationAndFindNearbyRecyclingPlace() {
+        val task: Task<Location> = fusedLocationProviderClient.lastLocation
+        if (
+            context?.let {
+                ActivityCompat.checkSelfPermission(
+                    it.applicationContext,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                )
+            } != PackageManager.PERMISSION_GRANTED ||
+            context?.let {
+                ActivityCompat.checkSelfPermission(
+                    it.applicationContext,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 )
             } != PackageManager.PERMISSION_GRANTED
         ) {
@@ -71,7 +167,7 @@ class MapsFragment : Fragment() {
         task.addOnSuccessListener {
             if (it != null) {
                 val current = LatLng(it.latitude, it.longitude)
-                viewModel.setCurrentLocation(current)
+                viewModel.findNearbyRecyclingPlaceFromStart(current)
             }
         }
     }
@@ -83,8 +179,8 @@ class MapsFragment : Fragment() {
 //                it.applicationContext as Activity,
                 requireActivity(),
                 arrayOf(
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 ), permissionId
             )
         }
@@ -127,16 +223,10 @@ class MapsFragment : Fragment() {
     }
 
     private val callback = OnMapReadyCallback { googleMap ->
-        viewModel.currentLocation.observe(viewLifecycleOwner, {
-            googleMap.run {
-                addMarker(
-                    MarkerOptions().title("Your position")
-                        .position(it)
-                )
-                moveCamera(CameraUpdateFactory.zoomTo(12.0F))
-                moveCamera(CameraUpdateFactory.newLatLng(it))
-            }
-        })
+        googleMap.run {
+            moveCamera(CameraUpdateFactory.zoomTo(12.0F))
+            moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
+        }
 
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {
@@ -154,12 +244,27 @@ class MapsFragment : Fragment() {
                 .from(start)
                 .to(end)
                 .execute(
-                    onDirectionSuccess = { direction ->
-                        direction?.let {
+                    onDirectionSuccess = {
+                        it?.let {
                             onDirectionSuccess(googleMap, it)
                         }
                     }
                 )
+        })
+
+        val circle = googleMap.addCircle(
+            CircleOptions()
+                .center(defaultLocation)
+                .radius(30.0)
+                .fillColor(Color.parseColor("#e28eed"))
+                .strokeColor(Color.parseColor("#bf6dc9"))
+                .strokeWidth(8f)
+                .zIndex(2f)
+
+        )
+
+        viewModel.currentPosition.observe(viewLifecycleOwner, {
+            circle.center = it
         })
     }
 
@@ -171,7 +276,7 @@ class MapsFragment : Fragment() {
             directionPositionList,
             10,
             Color.parseColor("#67a9db")
-        )
+        ).zIndex(1f)
         googleMap.addPolyline(line)
         googleMap.addPolyline(line.width(5f).color(Color.parseColor("#aed6f5")))
         setCameraWithCoordinationBounds(googleMap, route)
@@ -187,36 +292,5 @@ class MapsFragment : Fragment() {
                 100
             )
         )
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return MapsViewModel(Util.recyclingPlaces) as T
-            }
-        }).get(MapsViewModel::class.java)
-        return inflater.inflate(R.layout.fragment_maps, container, false)
-    }
-
-    @RequiresApi(Build.VERSION_CODES.P)
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireContext())
-
-//        requestPermission()
-//        getLastLocation()
-
-        fetchLocation()
-        mapFragment?.getMapAsync(callback)
-//        if (savedInstanceState != null) {
-//            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
-//            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
-//        }
     }
 }
