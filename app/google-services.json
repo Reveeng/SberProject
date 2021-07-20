@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "421001721435",
+    "project_id": "sberproject-59520",
+    "storage_bucket": "sberproject-59520.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:421001721435:android:f77f8ddd40cb0b70d1317e",
+        "android_client_info": {
+          "package_name": "com.example.sberproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "421001721435-j5nq61sdg1nrtv03i6g3ksm1k4cactfl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcOEo_o3SxmjrFuR6zrlpeGe-IR9JkIfU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "421001721435-j5nq61sdg1nrtv03i6g3ksm1k4cactfl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
