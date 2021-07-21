@@ -12,10 +12,6 @@ import com.google.android.gms.maps.model.LatLng
 class MapsViewModel(
     private val recyclingPlacesList: List<RecyclingPlace>
 ) : ViewModel() {
-    private val mutableCurrentPosition by lazy{
-        MutableLiveData<LatLng>()
-    }
-    val currentPosition: LiveData<LatLng> = mutableCurrentPosition
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
     }
@@ -31,7 +27,6 @@ class MapsViewModel(
     }
 
     fun findNearbyRecyclingPlaceFromStart(start: LatLng) {
-//        mutableStartLocation.value = coordinates
         val nearbyRecyclingPlace = getNearbyRecyclingPlace(start)
         mutableRouteToNearbyRecyclingPlace.value = start to nearbyRecyclingPlace.coordinates
     }
@@ -63,9 +58,5 @@ class MapsViewModel(
             return it.first
         }
         throw Exception("There are no recycling places")
-    }
-
-    fun setCurrentPosition(position: LatLng){
-        mutableCurrentPosition.value = position
     }
 }

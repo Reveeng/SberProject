@@ -1,15 +1,11 @@
 package com.example.sberproject.ui.map
 
 import android.Manifest
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.location.Geocoder
 import android.location.Location
-import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -38,7 +34,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
-import java.util.*
 
 
 class MapsFragment : Fragment(), OnMapReadyCallback {
@@ -75,6 +70,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     ): View? {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
                 return MapsViewModel(Util.recyclingPlaces) as T
             }
         }).get(MapsViewModel::class.java)
@@ -87,71 +83,21 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
-
-//        requestPermission()
-//        getLastLocation()
-
-//        fetchLocation()
-
-//        mapFragment?.getMapAsync(callback)
         mapFragment?.getMapAsync(this)
-        //trashType = TrashType.CLOTHES
         trashType?.let {
             viewModel.setTrashType(it)
         }
-//        if (savedInstanceState != null) {
-//            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
-//            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
-//        }
     }
 
-    //function that allows us to get user permission
     private fun requestPermission() {
         context?.let {
             ActivityCompat.requestPermissions(
-//                it.applicationContext as Activity,
                 requireActivity(),
                 arrayOf(
                     Manifest.permission.ACCESS_FINE_LOCATION,
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ), permissionId
             )
-        }
-    }
-
-    // function that checks if the Location service is enabled on device
-    private fun isLocationEnabled(): Boolean {
-
-        val locationManager =
-            activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(
-            LocationManager.NETWORK_PROVIDER
-        )
-    }
-
-    //get the full address
-    private fun getCityName(lat: Double, long: Double): String {
-        var cityName: String = ""
-        var countryName = ""
-        val geoCoder = Geocoder(requireContext(), Locale.getDefault())
-        val address = geoCoder.getFromLocation(lat, long, 3)
-
-        cityName = address[0].locality
-        countryName = address[0].countryName
-        Log.d("Debug:", "Your City: $cityName ; your Country $countryName")
-        return cityName
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        //we use it just for debugging
-        if (requestCode == permissionId) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d("Debug", "You have the Permission")
-            }
         }
     }
 
