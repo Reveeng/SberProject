@@ -9,13 +9,13 @@ import android.location.Location
 import android.location.LocationManager
 import android.os.Build
 import android.os.Bundle
-import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -27,17 +27,21 @@ import com.akexorcist.googledirection.util.execute
 import com.example.sberproject.R
 import com.example.sberproject.TrashType
 import com.example.sberproject.Util
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.gms.tasks.Task
 import java.util.*
 
 
-class MapsFragment : Fragment() {
+class MapsFragment : Fragment(), OnMapReadyCallback {
     companion object {
         const val TRASH_TYPE = "trash type"
 
@@ -49,31 +53,13 @@ class MapsFragment : Fragment() {
         }
     }
 
+    private lateinit var googleMap: GoogleMap
     private var trashType: TrashType? = null
     private lateinit var viewModel: MapsViewModel
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
     private var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var permissionId = 52
-    private val locationCallback by lazy {
-        object : LocationCallback() {
-            override fun onLocationResult(locationResult: LocationResult) {
-                viewModel.setCurrentPosition(
-                    LatLng(
-                        locationResult.lastLocation.latitude,
-                        locationResult.lastLocation.longitude
-                    )
-                )
-            }
-        }
-    }
-    private val locationRequest by lazy {
-        LocationRequest.create().apply {
-            interval = 5000
-            fastestInterval = 1000
-            priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        }
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,69 +93,16 @@ class MapsFragment : Fragment() {
 
 //        fetchLocation()
 
-        mapFragment?.getMapAsync(callback)
-//        trashType = TrashType.CLOTHES
+//        mapFragment?.getMapAsync(callback)
+        mapFragment?.getMapAsync(this)
+        //trashType = TrashType.CLOTHES
         trashType?.let {
             viewModel.setTrashType(it)
-            fetchCurrentLocationAndFindNearbyRecyclingPlace()
         }
 //        if (savedInstanceState != null) {
 //            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION)
 //            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION)
 //        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        if (
-            context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            } != PackageManager.PERMISSION_GRANTED ||
-            context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            } != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermission()
-            return
-        }
-        fusedLocationProviderClient.requestLocationUpdates(
-            locationRequest,
-            locationCallback,
-            Looper.getMainLooper()
-        )
-    }
-
-    private fun fetchCurrentLocationAndFindNearbyRecyclingPlace() {
-        val task: Task<Location> = fusedLocationProviderClient.lastLocation
-        if (
-            context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            } != PackageManager.PERMISSION_GRANTED ||
-            context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it.applicationContext,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            } != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermission()
-            return
-        }
-        task.addOnSuccessListener {
-            if (it != null) {
-                val current = LatLng(it.latitude, it.longitude)
-                viewModel.findNearbyRecyclingPlaceFromStart(current)
-            }
-        }
     }
 
     //function that allows us to get user permission
@@ -222,7 +155,9 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private val callback = OnMapReadyCallback { googleMap ->
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        enableMyLocation()
         googleMap.run {
             moveCamera(CameraUpdateFactory.zoomTo(12.0F))
             moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
@@ -251,21 +186,28 @@ class MapsFragment : Fragment() {
                     }
                 )
         })
+    }
 
-        val circle = googleMap.addCircle(
-            CircleOptions()
-                .center(defaultLocation)
-                .radius(30.0)
-                .fillColor(Color.parseColor("#e28eed"))
-                .strokeColor(Color.parseColor("#bf6dc9"))
-                .strokeWidth(8f)
-                .zIndex(2f)
-
-        )
-
-        viewModel.currentPosition.observe(viewLifecycleOwner, {
-            circle.center = it
-        })
+    private fun enableMyLocation() {
+        if (!::googleMap.isInitialized) return
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            googleMap.isMyLocationEnabled = true
+            val task: Task<Location> = fusedLocationProviderClient.lastLocation
+            task.addOnSuccessListener {
+                if (it != null) {
+                    val current = LatLng(it.latitude, it.longitude)
+                    trashType?.let {
+                        viewModel.findNearbyRecyclingPlaceFromStart(current)
+                    }
+                }
+            }
+        } else
+            requestPermission()
     }
 
     private fun onDirectionSuccess(googleMap: GoogleMap, direction: Direction) {
@@ -275,10 +217,9 @@ class MapsFragment : Fragment() {
             requireContext(),
             directionPositionList,
             10,
-            Color.parseColor("#67a9db")
-        ).zIndex(1f)
+            Color.parseColor("#aed6f5")
+        )
         googleMap.addPolyline(line)
-        googleMap.addPolyline(line.width(5f).color(Color.parseColor("#aed6f5")))
         setCameraWithCoordinationBounds(googleMap, route)
     }
 
