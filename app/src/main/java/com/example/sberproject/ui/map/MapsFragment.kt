@@ -2,6 +2,8 @@ package com.example.sberproject.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.location.Location
 import android.os.Build
@@ -9,9 +11,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupWindow
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -23,16 +28,14 @@ import com.akexorcist.googledirection.util.execute
 import com.example.sberproject.R
 import com.example.sberproject.TrashType
 import com.example.sberproject.Util
+import com.example.sberproject.databinding.RecyclingPlaceInfoBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 
 
@@ -107,6 +110,34 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         googleMap.run {
             moveCamera(CameraUpdateFactory.zoomTo(12.0F))
             moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
+            setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+                override fun getInfoWindow(marker: Marker): View? {
+                    return null
+                }
+
+                override fun getInfoContents(marker: Marker): View {
+                    val binding = RecyclingPlaceInfoBinding.inflate(layoutInflater)
+                    binding.recyclingPlaceName.text = marker.title
+                    val trashTypes = Util.recyclingPlaceToTrashTypes[marker.title]
+                    var i = 0
+                    trashTypes?.forEach { trashType ->
+                        Util.trashTypeToIcon[trashType]?.let { r ->
+                            val image = ImageView(requireContext())
+                            val b = BitmapFactory.decodeResource(resources, r)
+                            image.setImageDrawable(
+                                Bitmap.createBitmap(b, 0, 0, b.width, b.height / 2)
+                                    .toDrawable(resources)
+                            )
+                            if (i < 6)
+                                binding.trashTypes1.addView(image)
+                            else
+                                binding.trashTypes2.addView(image)
+                            i++
+                        }
+                    }
+                    return binding.root
+                }
+            })
         }
 
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->

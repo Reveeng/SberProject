@@ -31,6 +31,7 @@ object Util {
                     TrashType.METAL,
                     TrashType.APPLIANCES,
                     TrashType.TETRA_PACK,
+                    TrashType.CAPS,
                     TrashType.OTHER
                 )
             ),
@@ -61,6 +62,28 @@ object Util {
         val result = TrashType.values().map { it to mutableListOf<RecyclingPlace>() }.toMap()
         recyclingPlaces.map { rp -> rp.trashTypes.map { result[it]?.add(rp) } }
         result
+    }
+
+    val recyclingPlaceToTrashTypes by lazy {
+        recyclingPlaces.map { it.name to it.trashTypes }.toMap()
+    }
+
+    val trashTypeToIcon by lazy{
+        mapOf(
+            TrashType.PAPER to R.drawable.trash_1,
+            TrashType.PLASTIC to R.drawable.trash_3,
+            TrashType.CLOTHES to R.drawable.trash_5,
+            TrashType.APPLIANCES to R.drawable.trash_10,
+            TrashType.GLASS to R.drawable.trash_2,
+            TrashType.METAL to R.drawable.trash_4,
+            TrashType.LAMPS to R.drawable.trash_9,
+            TrashType.HAZARDOUS_WASTE to R.drawable.trash_7,
+            TrashType.BATTERIES to R.drawable.trash_8,
+            TrashType.TETRA_PACK to R.drawable.trash_11,
+            TrashType.CAPS to R.drawable.trash_12,
+            TrashType.TIRES to R.drawable.trash_13,
+            TrashType.OTHER to R.drawable.trash_6
+        )
     }
 
     val trashTypeToMarker by lazy {
@@ -95,7 +118,36 @@ object Util {
                 TrashType.OTHER,
                 TrashType.APPLIANCES
             ) to R.drawable.marker_1_2_3_4_5_6_10,
+            setOf(
+                TrashType.PAPER,
+                TrashType.GLASS,
+                TrashType.PLASTIC,
+                TrashType.METAL,
+                TrashType.CLOTHES,
+                TrashType.OTHER,
+                TrashType.APPLIANCES,
+                TrashType.CAPS,
+                TrashType.TIRES
+            ) to R.drawable.marker_1_2_3_4_5_6_10_11_12,
+            setOf(
+                TrashType.PAPER,
+                TrashType.GLASS,
+                TrashType.PLASTIC,
+                TrashType.METAL,
+                TrashType.CLOTHES,
+                TrashType.OTHER,
+                TrashType.APPLIANCES,
+                TrashType.TETRA_PACK,
+                TrashType.CAPS
+            ) to R.drawable.marker_1_2_3_4_5_6_8_10_12,
             setOf(TrashType.PAPER, TrashType.PLASTIC) to R.drawable.marker_1_3,
+            setOf(TrashType.PAPER, TrashType.PLASTIC, TrashType.CLOTHES) to R.drawable.marker_1_3_5,
+            setOf(
+                TrashType.PAPER,
+                TrashType.PLASTIC,
+                TrashType.OTHER,
+                TrashType.CAPS
+            ) to R.drawable.marker_1_3_6_12,
             setOf(TrashType.PAPER, TrashType.PLASTIC, TrashType.METAL) to R.drawable.marker_1_3_4,
             setOf(
                 TrashType.PAPER,
@@ -130,7 +182,26 @@ object Util {
                 TrashType.BATTERIES,
                 TrashType.LAMPS
             ) to R.drawable.marker_7_8_9,
-            setOf(TrashType.BATTERIES, TrashType.LAMPS) to R.drawable.marker_8_9
+            setOf(TrashType.BATTERIES, TrashType.LAMPS) to R.drawable.marker_8_9,
+            setOf(
+                TrashType.PAPER,
+                TrashType.OTHER,
+                TrashType.HAZARDOUS_WASTE,
+                TrashType.BATTERIES,
+                TrashType.LAMPS,
+                TrashType.APPLIANCES
+            ) to R.drawable.marker_1_6_7_8_9_10,
+            setOf(
+                TrashType.PAPER,
+                TrashType.OTHER,
+                TrashType.HAZARDOUS_WASTE,
+                TrashType.BATTERIES,
+                TrashType.LAMPS,
+                TrashType.APPLIANCES,
+                TrashType.TIRES
+            ) to R.drawable.marker_1_6_7_8_9_10_13,
+            setOf(TrashType.PLASTIC, TrashType.CAPS) to R.drawable.marker_3_12,
+            setOf(TrashType.CAPS) to R.drawable.marker_12
         )
     }
 }
