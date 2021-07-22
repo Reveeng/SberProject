@@ -9,7 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-//import com.example.sberproject.databinding.FragmentScannerBinding
 import com.example.sberproject.R
 import android.Manifest
 import android.annotation.SuppressLint
@@ -58,14 +57,14 @@ class ScannerFragment : Fragment() {
     //this property block sending soap request if new barcode equal to old barcode
     private var prevBarcode: String = ""
 
-    private val SoapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"+
+    private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"+
             "<SOAP-ENV:Envelope "+
             "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "+
             "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "+
             "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "+
             "xmlns:tns=\"http://service.uhtt.ru/\">"+
             "<SOAP-ENV:Body>"
-    private val SoapEnd: String = "</SOAP-ENV:Body>"+
+    private val soapEnd: String = "</SOAP-ENV:Body>"+
             "</SOAP-ENV:Envelope>"
     private var token: String = ""
     //ml kit poorly distinguished number like 1,7,4 so i just store all unique barcodes from 10 frames
@@ -271,12 +270,12 @@ class ScannerFragment : Fragment() {
         }
     }
     private fun getUHTTToken(){
-        val postBody:String = this.SoapBegin+
+        val postBody:String = this.soapBegin+
                 "<tns:auth>"+
                     "<email xsi:type='xsd:string'>ntesla2016@yandex.ru</email>"+
                     "<password xsi:type='xsd:string'>KOKS4212</password>"+
                 "</tns:auth>"+
-                this.SoapEnd
+                this.soapEnd
         val request = Request.Builder()
                 .url("http://www.uhtt.ru/dispatcher/ws/iface")
                 .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
@@ -303,12 +302,12 @@ class ScannerFragment : Fragment() {
     }
 
     private fun getGoodsByCode(barcode:String){
-        val postBody:String = this.SoapBegin+
+        val postBody:String = this.soapBegin+
                 "<tns:getGoodsByCode>"+
                 "<token xsi:type='xsd:string'>"+this.token+"</token>"+
                 "<code xsi:type='xsd:string'>"+barcode+"</code>"+
                 "</tns:getGoodsByCode>"+
-                this.SoapEnd
+                this.soapEnd
         val request = Request.Builder()
             .url("http://www.uhtt.ru/dispatcher/ws/iface")
             .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
