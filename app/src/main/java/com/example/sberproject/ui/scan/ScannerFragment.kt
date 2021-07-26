@@ -65,6 +65,7 @@ class ScannerFragment : Fragment() {
     private lateinit var container: RelativeLayout
     //button on screen
     private var scanButton: Button ? = null
+    private var scanButton2: Button ? = null
     //just property that signal app that button pressed
     private var needToScan: Boolean by Delegates.observable(false){
         prop,old,new ->
@@ -110,12 +111,15 @@ class ScannerFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View?  = inflater.inflate(R.layout.fragment_scanner,container,false)
 
-    @SuppressLint("MissingPermission", "ClickableViewAccessibility")
+    @SuppressLint("MissingPermission", "ClickableViewAccessibility",
+        "SourceLockedOrientationActivity"
+    )
     override fun onViewCreated(view: View, savedInstanceState: Bundle?){
         super.onViewCreated(view, savedInstanceState)
         container = view as RelativeLayout
         previewView = container.findViewById(R.id.preview_view)
         scanButton = container.findViewById(R.id.scanBtn)
+
         //trigger scanning by touch button
         scanButton?.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN){
@@ -345,11 +349,13 @@ class ScannerFragment : Fragment() {
                 var goods: String? = regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
                 if (goods != null) {
                     goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
-                    println(goods)
-                    val trashIndex: Int = findTrashType(goods)
-                    var bundle = Bundle()
-                    bundle.putInt("TrashType", trashIndex)
-                    findNavController().navigate(R.id.navigation_maps,bundle)
+                    var trashIndex = findTrashType(goods)
+                    requireActivity().runOnUiThread{
+
+                        var bundle = Bundle().apply {putSerializable(MapsFragment.TRASH_TYPE,TrashType.fromInt(trashIndex))}
+                        findNavController().navigate(R.id.navigation_maps,bundle)
+                    }
+
                 }
             }
         })
