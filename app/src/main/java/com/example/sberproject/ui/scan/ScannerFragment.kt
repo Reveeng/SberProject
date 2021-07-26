@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat
 import com.example.sberproject.R
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.os.Build
 import android.os.CountDownTimer
 import android.text.Html
@@ -25,6 +26,10 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.sberproject.TrashType
+import com.example.sberproject.ui.map.MapsFragment
+import com.google.android.gms.maps.MapFragment
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -37,11 +42,19 @@ import java.io.IOException
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.properties.Delegates
 
 class ScannerFragment : Fragment() {
+    private val KeyValue =
+        arrayOf(
+            //key value for paper
+            arrayOf("книга","тетрадь"),
+            //key value for plastic
+            arrayOf("пл.{1}бут","п.{1}б","пэт")
+            //TODO: add other key words for trash type
+        )
 
-
-//object that need for scaner
+//objects that need for scaner
     private var cameraSelector: CameraSelector? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var previewView: PreviewView? = null
@@ -53,7 +66,13 @@ class ScannerFragment : Fragment() {
     //button on screen
     private var scanButton: Button ? = null
     //just property that signal app that button pressed
-    private var needToScan: Boolean = false
+    private var needToScan: Boolean by Delegates.observable(false){
+        prop,old,new ->
+        if (!new){
+            haveCodeInDb = new
+            barcodeArray.clear()
+        }
+    }
     //this property block sending soap request if new barcode equal to old barcode
     private var prevBarcode: String = ""
 
@@ -110,6 +129,7 @@ class ScannerFragment : Fragment() {
             }
             false
         }
+        activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setupCamera()
         getUHTTToken()
         timer.start()
@@ -234,23 +254,20 @@ class ScannerFragment : Fragment() {
         barcodeScanner.process(inputImage)
             .addOnSuccessListener { barcodes ->
                 if (this.needToScan && !haveCodeInDb) {
+                    frameCount++
                     barcodes.forEach {
-                        if (frameCount < 10) {
+                        if (frameCount != 10){
                             if (prevBarcode != it.rawValue && it.rawValue.length == 13) {
-                                frameCount++
                                 if (!barcodeArray.contains(it.rawValue)) {
                                     barcodeArray.add(it.rawValue)
                                 }
                             }
                         }
-                        if (frameCount == 10) {
-                            frameCount++
-                            if(barcodeArray.isEmpty()){
-                                frameCount = 0
-                            }
-                            else{
+                        else {
+                            if (barcodeArray.isNotEmpty()){
                                 checkBarcodes()
                             }
+                            frameCount = 0
                         }
                     }
                 }
@@ -323,13 +340,31 @@ class ScannerFragment : Fragment() {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 haveCodeInDb = true
                 val strResponse: String = response.body!!.string()
+                println(strResponse)
                 val regex = Regex("<Name>.*</Name>")
-                val goods: String? = regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
-                println(Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY))
+                var goods: String? = regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
+                if (goods != null) {
+                    goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
+                    println(goods)
+                    val trashIndex: Int = findTrashType(goods)
+                    var bundle = Bundle()
+                    bundle.putInt("TrashType", trashIndex)
+                    findNavController().navigate(R.id.navigation_maps,bundle)
+                }
             }
         })
     }
 
+    private fun findTrashType(goods : String): Int {
+        for ((index, values) in KeyValue.withIndex()){
+            for (oneString in values){
+                val regex = Regex(oneString, RegexOption.IGNORE_CASE)
+                if (regex.containsMatchIn(goods))
+                    return index
+            }
+        }
+        return -1
+    }
 
     override fun onRequestPermissionsResult(
         requestCode: Int,

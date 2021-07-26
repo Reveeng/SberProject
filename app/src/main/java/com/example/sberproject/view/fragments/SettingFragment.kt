@@ -1,10 +1,11 @@
-package com.example.sberproject
+package com.example.sberproject.view.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.example.sberproject.R
 
 class SettingFragment : Fragment() {
 

@@ -1,66 +1,68 @@
 package com.example.sberproject.ui.map
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
-import androidx.fragment.app.Fragment
-
+import android.location.Location
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.PopupWindow
+import androidx.annotation.RequiresApi
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.toDrawable
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.akexorcist.googledirection.GoogleDirection
+import com.akexorcist.googledirection.model.Direction
+import com.akexorcist.googledirection.model.Route
+import com.akexorcist.googledirection.util.DirectionConverter
+import com.akexorcist.googledirection.util.execute
 import com.example.sberproject.R
-
+import com.example.sberproject.TrashType
+import com.example.sberproject.Util
+import com.example.sberproject.databinding.RecyclingPlaceInfoBinding
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.gms.tasks.Task
 
-class MapsFragment : Fragment() {
 
-    private val callback = OnMapReadyCallback { googleMap ->
-        val currentPos = LatLng(56.83556279777945, 60.61052534309914)
-//        val arrayOfMarkers: Array<Marker>
+class MapsFragment : Fragment(), OnMapReadyCallback {
+    companion object {
+        const val TRASH_TYPE = "trash type"
 
-        val curPos: Marker = googleMap.addMarker(MarkerOptions()
-            .position(currentPos)
-            .title("Your position"))
-        val nemus: Marker = googleMap.addMarker(MarkerOptions()
-            .position(LatLng(56.8407395692402, 60.593118629081964))
-            .title("Немузей мусора")
-            .icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_AZURE)))
-        val predp: Marker = googleMap.addMarker(MarkerOptions()
-            .position(LatLng(56.83293148535164, 60.61301988490218))
-            .title("Предприятие комплексного решения проблем промышленных отходов")
-            .icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_CYAN)))
-        val monast: Marker = googleMap.addMarker(MarkerOptions()
-            .position(LatLng(56.822856527309504, 60.59851815236338))
-            .title("Ново-тихвинский женский монастырь")
-            .icon(BitmapDescriptorFactory
-                .defaultMarker(BitmapDescriptorFactory.HUE_ORANGE)))
-        val line: Polyline = googleMap.addPolyline(PolylineOptions()
-            .add(
-                LatLng(56.83529218503051, 60.61094518304741),
-                LatLng(56.833666581963925, 60.59570049330751),
-                LatLng(56.839178319738956, 60.59400247705653),
-                LatLng(56.83956076465086, 60.594364554036794),
-                LatLng(56.840530518092145, 60.594152302007345),
-                LatLng(56.84082417086563, 60.59406490411435),
-                LatLng(56.84094709459853, 60.593877622915066),
-                LatLng(56.8412202570042, 60.59330329390392),
-                LatLng(56.84068758846683, 60.59330329390392)
-            )
-            .color(-65536))
-        if (arguments?.getBoolean("MyArg") == true){
-            line.isVisible =  true
-            nemus.showInfoWindow()
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(14.0F))
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(LatLng(56.83715334529192, 60.5989840370588)))
+        @JvmStatic
+        fun newInstance(trashType: TrashType) = MapsFragment().apply {
+            arguments = Bundle().apply {
+                putSerializable(TRASH_TYPE, trashType)
+            }
         }
-        else{
-            line.isVisible = false
-            googleMap.moveCamera(CameraUpdateFactory.zoomTo(13.0F))
-            googleMap.moveCamera(CameraUpdateFactory.newLatLng(currentPos))
+    }
+
+    private lateinit var googleMap: GoogleMap
+    private var trashType: TrashType? = null
+    private lateinit var viewModel: MapsViewModel
+    private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+
+    private var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
+    private var permissionId = 52
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.getSerializable(TRASH_TYPE)?.let {
+            trashType = it as TrashType
         }
     }
 
@@ -69,12 +71,144 @@ class MapsFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return MapsViewModel(Util.recyclingPlaces) as T
+            }
+        }).get(MapsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
+    @RequiresApi(Build.VERSION_CODES.P)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        mapFragment?.getMapAsync(callback)
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())
+        mapFragment?.getMapAsync(this)
+        trashType?.let {
+            viewModel.setTrashType(it)
+        }
+    }
+
+    private fun requestPermission() {
+        context?.let {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ), permissionId
+            )
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        this.googleMap = googleMap
+        enableMyLocation()
+        googleMap.run {
+            moveCamera(CameraUpdateFactory.zoomTo(12.0F))
+            moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
+            setInfoWindowAdapter(object : GoogleMap.InfoWindowAdapter {
+                override fun getInfoWindow(marker: Marker): View? {
+                    return null
+                }
+
+                override fun getInfoContents(marker: Marker): View {
+                    val binding = RecyclingPlaceInfoBinding.inflate(layoutInflater)
+                    binding.recyclingPlaceName.text = marker.title
+                    val trashTypes = Util.recyclingPlaceToTrashTypes[marker.title]
+                    var i = 0
+                    trashTypes?.forEach { trashType ->
+                        Util.trashTypeToIcon[trashType]?.let { r ->
+                            val image = ImageView(requireContext())
+                            val b = BitmapFactory.decodeResource(resources, r)
+                            image.setImageDrawable(
+                                Bitmap.createBitmap(b, 0, 0, b.width, b.height / 2)
+                                    .toDrawable(resources)
+                            )
+                            if (i < 6)
+                                binding.trashTypes1.addView(image)
+                            else
+                                binding.trashTypes2.addView(image)
+                            i++
+                        }
+                    }
+                    return binding.root
+                }
+            })
+        }
+
+        viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
+            googleMap.run {
+                recyclingPlaces.map {
+                    val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
+                        BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
+                    else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
+                    addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))
+                }
+            }
+        })
+
+        viewModel.routeToNearbyRecyclingPlace.observe(viewLifecycleOwner, { (start, end) ->
+            GoogleDirection.withServerKey(getString(R.string.google_maps_key))
+                .from(start)
+                .to(end)
+                .execute(
+                    onDirectionSuccess = {
+                        it?.let {
+                            onDirectionSuccess(googleMap, it)
+                        }
+                    }
+                )
+        })
+    }
+
+    private fun enableMyLocation() {
+        if (!::googleMap.isInitialized) return
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            )
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            googleMap.isMyLocationEnabled = true
+            val task: Task<Location> = fusedLocationProviderClient.lastLocation
+            task.addOnSuccessListener {
+                if (it != null) {
+                    val current = LatLng(it.latitude, it.longitude)
+                    trashType?.let {
+                        viewModel.findNearbyRecyclingPlaceFromStart(current)
+                    }
+                }
+            }
+        } else
+            requestPermission()
+    }
+
+    private fun onDirectionSuccess(googleMap: GoogleMap, direction: Direction) {
+        val route = direction.routeList[0]
+        val directionPositionList = route.legList[0].directionPoint
+        val line = DirectionConverter.createPolyline(
+            requireContext(),
+            directionPositionList,
+            10,
+            Color.parseColor("#aed6f5")
+        )
+        googleMap.addPolyline(line)
+        setCameraWithCoordinationBounds(googleMap, route)
+    }
+
+    private fun setCameraWithCoordinationBounds(googleMap: GoogleMap, route: Route) {
+        val southwest = route.bound.southwestCoordination.coordination
+        val northeast = route.bound.northeastCoordination.coordination
+        val bounds = LatLngBounds(southwest, northeast)
+        googleMap.animateCamera(
+            CameraUpdateFactory.newLatLngBounds(
+                bounds,
+                100
+            )
+        )
     }
 }

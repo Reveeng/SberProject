@@ -28,25 +28,31 @@
         android:id="@+id/navigation_scanner"
         android:name="com.example.sberproject.ui.scan.ScannerFragment"
         tools:layout="@layout/fragment_scanner" >
+<!--        <action-->
+<!--            android:id="@+id/action_navigation_scanner_to_firstInstructionFragment"-->
+<!--            app:destination="@id/navigation_first_instruction" />-->
         <action
-            android:id="@+id/action_navigation_scanner_to_firstInstructionFragment"
+            android:id="@+id/action_navigation_scanner_to_navigation_first_instruction"
             app:destination="@id/navigation_first_instruction" />
+        <action
+            android:id="@+id/action_navigation_scanner_to_navigation_maps"
+            app:destination="@id/navigation_maps" />
     </fragment>
     <fragment
         android:id="@+id/navigation_account"
-        android:name="com.example.sberproject.AccountFragment"
+        android:name="com.example.sberproject.view.fragments.AccountFragment"
         tools:layout="@layout/fragment_account" />
     <fragment
         android:id="@+id/navigation_setting"
-        android:name="com.example.sberproject.SettingFragment"
+        android:name="com.example.sberproject.view.fragments.SettingFragment"
         tools:layout="@layout/fragment_setting" />
     <fragment
         android:id="@+id/navigation_browser"
-        android:name="com.example.sberproject.browserFragment"
+        android:name="com.example.sberproject.view.fragments.BrowserFragment"
         tools:layout="@layout/fragment_browser" />
     <fragment
         android:id="@+id/navigation_first_instruction"
-        android:name="com.example.sberproject.FirstInstructionFragment"
+        android:name="com.example.sberproject.view.fragments.FirstInstructionFragment"
         tools:layout="@layout/fragment_first_instruction" >
         <action
             android:id="@+id/action_navigation_first_instruction_to_navigation_maps"
