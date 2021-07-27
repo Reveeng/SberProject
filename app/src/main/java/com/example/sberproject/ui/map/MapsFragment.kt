@@ -8,17 +8,17 @@ import android.graphics.Color
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
-import android.widget.PopupWindow
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.akexorcist.googledirection.GoogleDirection
 import com.akexorcist.googledirection.model.Direction
@@ -64,6 +64,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         arguments?.getSerializable(TRASH_TYPE)?.let {
             trashType = it as TrashType
         }
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            MapsViewModelFactory()
+        ).get(MapsViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -71,12 +75,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return MapsViewModel(Util.recyclingPlaces) as T
-            }
-        }).get(MapsViewModel::class.java)
         return inflater.inflate(R.layout.fragment_maps, container, false)
     }
 
@@ -122,16 +120,33 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     var i = 0
                     trashTypes?.forEach { trashType ->
                         Util.trashTypeToIcon[trashType]?.let { r ->
-                            val image = ImageView(requireContext())
-                            val b = BitmapFactory.decodeResource(resources, r)
-                            image.setImageDrawable(
-                                Bitmap.createBitmap(b, 0, 0, b.width, b.height / 2)
-                                    .toDrawable(resources)
+                            val textView = TextView(requireContext())
+                            textView.text = trashType.toString()
+                            val params = LinearLayout.LayoutParams(
+                                ViewGroup.LayoutParams.MATCH_PARENT,
+                                ViewGroup.LayoutParams.MATCH_PARENT
                             )
-                            if (i < 6)
-                                binding.trashTypes1.addView(image)
-                            else
-                                binding.trashTypes2.addView(image)
+                            params.rightMargin = TypedValue.applyDimension(
+                                TypedValue.COMPLEX_UNIT_DIP, 5f, resources.displayMetrics
+                            ).toInt()
+                            textView.layoutParams = params
+
+                            val b = BitmapFactory.decodeResource(resources, r)
+                            val drawable = Bitmap.createBitmap(b, 0, 0, b.width, b.height / 2)
+                                .toDrawable(resources)
+                            textView.setCompoundDrawablesWithIntrinsicBounds(
+                                null,
+                                drawable,
+                                null,
+                                null
+                            )
+                            textView.textSize = 10f
+                            val layout = when {
+                                i < 4 -> binding.trashTypes1
+                                i in 4..7 -> binding.trashTypes2
+                                else -> binding.trashTypes3
+                            }
+                            layout.addView(textView)
                             i++
                         }
                     }
@@ -142,6 +157,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
 
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {
+                clear()
                 recyclingPlaces.map {
                     val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
                         BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
@@ -163,6 +179,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     }
                 )
         })
+    }
+
+    private fun setRoute(location: Location) {
+
     }
 
     private fun enableMyLocation() {
