@@ -45,76 +45,85 @@ import kotlin.math.min
 import kotlin.properties.Delegates
 
 class ScannerFragment : Fragment() {
-    private val KeyValue =
+    private val keyValue =
         arrayOf(
             //key value for paper
-            arrayOf("книга","тетрадь"),
+            arrayOf("книга", "тетрадь"),
             //key value for plastic
-            arrayOf("пл.{1}бут","п.{1}б","пэт")
+            arrayOf("пл.{1}бут", "п.{1}б", "пэт")
             //TODO: add other key words for trash type
         )
 
-//objects that need for scaner
+    //objects that need for scaner
     private var cameraSelector: CameraSelector? = null
     private var cameraProvider: ProcessCameraProvider? = null
     private var previewView: PreviewView? = null
     private var previewUseCase: Preview? = null
     private var analysisUseCase: ImageAnalysis? = null
     private var lensFacing = CameraSelector.LENS_FACING_BACK
+
     //container for fragment
     private lateinit var container: RelativeLayout
+
     //button on screen
-    private var scanButton: Button ? = null
-    private var scanButton2: Button ? = null
+    private var scanButton: Button? = null
+
     //just property that signal app that button pressed
-    private var needToScan: Boolean by Delegates.observable(false){
-        prop,old,new ->
-        if (!new){
+    private var needToScan: Boolean by Delegates.observable(false) { prop, old, new ->
+        if (!new) {
             haveCodeInDb = new
             barcodeArray.clear()
         }
     }
+
     //this property block sending soap request if new barcode equal to old barcode
     private var prevBarcode: String = ""
 
-    private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"+
-            "<SOAP-ENV:Envelope "+
-            "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "+
-            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" "+
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" "+
-            "xmlns:tns=\"http://service.uhtt.ru/\">"+
+    private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
+            "<SOAP-ENV:Envelope " +
+            "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
+            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
+            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+            "xmlns:tns=\"http://service.uhtt.ru/\">" +
             "<SOAP-ENV:Body>"
-    private val soapEnd: String = "</SOAP-ENV:Body>"+
+    private val soapEnd: String = "</SOAP-ENV:Body>" +
             "</SOAP-ENV:Envelope>"
     private var token: String = ""
+
     //ml kit poorly distinguished number like 1,7,4 so i just store all unique barcodes from 10 frames
-    private var barcodeArray: MutableList<String> =  arrayListOf()
+    private var barcodeArray: MutableList<String> = arrayListOf()
+
     //frame counter
-    private var frameCount:Int = 0
+    private var frameCount: Int = 0
+
     //if db contain barcode stop scanning
-    private var haveCodeInDb:Boolean = false
+    private var haveCodeInDb: Boolean = false
+
     //every 60 second need to refresh uhtt token
-    private val timer: CountDownTimer = object : CountDownTimer(60000, 1000){
+    private val timer: CountDownTimer = object : CountDownTimer(60000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
-            println(millisUntilFinished/1000)
+            println(millisUntilFinished / 1000)
         }
+
         override fun onFinish() {
             getUHTTToken()
             this.start()
         }
     }
+
     //http client
     private val client = OkHttpClient()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View?  = inflater.inflate(R.layout.fragment_scanner,container,false)
+    ): View? = inflater.inflate(R.layout.fragment_scanner, container, false)
 
-    @SuppressLint("MissingPermission", "ClickableViewAccessibility",
+    @SuppressLint(
+        "MissingPermission", "ClickableViewAccessibility",
         "SourceLockedOrientationActivity"
     )
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         container = view as RelativeLayout
         previewView = container.findViewById(R.id.preview_view)
@@ -122,12 +131,12 @@ class ScannerFragment : Fragment() {
 
         //trigger scanning by touch button
         scanButton?.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN){
+            if (event.action == MotionEvent.ACTION_DOWN) {
 
                 this.needToScan = true
                 println(this.needToScan)
             }
-            if (event.action == MotionEvent.ACTION_UP){
+            if (event.action == MotionEvent.ACTION_UP) {
                 this.needToScan = false
                 println(this.needToScan)
             }
@@ -153,6 +162,7 @@ class ScannerFragment : Fragment() {
                 metrics.heightPixels
             )
         }
+
     private fun aspectRatio(width: Int, height: Int): Int {
         val previewRatio = max(width, height).toDouble() / min(width, height)
         if (abs(previewRatio - RATIO_4_3_VALUE) <= abs(previewRatio - RATIO_16_9_VALUE)) {
@@ -161,16 +171,18 @@ class ScannerFragment : Fragment() {
         return AspectRatio.RATIO_16_9
     }
 
-    private fun setupCamera(){
+    private fun setupCamera() {
         cameraSelector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
         ViewModelProvider(
-            this,ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
+            this,
+            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
+        )
             .get(CameraXViewModel::class.java)
             .processCameraProvider
             .observe(viewLifecycleOwner,
                 Observer { provider: ProcessCameraProvider? ->
                     cameraProvider = provider
-                    if (isCameraPermissionGranted()){
+                    if (isCameraPermissionGranted()) {
                         bindCameraUseCases()
                     } else {
                         this.activity?.let {
@@ -183,6 +195,7 @@ class ScannerFragment : Fragment() {
                     }
                 })
     }
+
     private fun bindCameraUseCases() {
         bindPreviewUseCase()
         bindAnalyseUseCase()
@@ -213,8 +226,8 @@ class ScannerFragment : Fragment() {
         }
     }
 
-    private fun bindAnalyseUseCase(){
-        val barcodeScanner : BarcodeScanner = BarcodeScanning.getClient()
+    private fun bindAnalyseUseCase() {
+        val barcodeScanner: BarcodeScanner = BarcodeScanning.getClient()
         if (cameraProvider == null) {
             return
         }
@@ -227,7 +240,7 @@ class ScannerFragment : Fragment() {
             .build()
         val cameraExecutor = Executors.newSingleThreadExecutor()
         analysisUseCase?.setAnalyzer(cameraExecutor,
-            ImageAnalysis.Analyzer {imageProxy ->
+            ImageAnalysis.Analyzer { imageProxy ->
                 processImageProxy(
                     barcodeScanner,
                     imageProxy
@@ -246,12 +259,13 @@ class ScannerFragment : Fragment() {
             Log.e(TAG, illegalArgumentException.message.toString())
         }
     }
+
     //called when ml kit see barcode
     @SuppressLint("UnsafeOptInUsageError")
     private fun processImageProxy(
         barcodeScanner: BarcodeScanner,
         imageProxy: ImageProxy
-    ){
+    ) {
         val inputImage =
             InputImage.fromMediaImage(imageProxy.image!!, imageProxy.imageInfo.rotationDegrees)
 
@@ -260,15 +274,14 @@ class ScannerFragment : Fragment() {
                 if (this.needToScan && !haveCodeInDb) {
                     frameCount++
                     barcodes.forEach {
-                        if (frameCount != 10){
+                        if (frameCount != 10) {
                             if (prevBarcode != it.rawValue && it.rawValue.length == 13) {
                                 if (!barcodeArray.contains(it.rawValue)) {
                                     barcodeArray.add(it.rawValue)
                                 }
                             }
-                        }
-                        else {
-                            if (barcodeArray.isNotEmpty()){
+                        } else {
+                            if (barcodeArray.isNotEmpty()) {
                                 checkBarcodes()
                             }
                             frameCount = 0
@@ -284,50 +297,19 @@ class ScannerFragment : Fragment() {
             }
     }
 
-    private fun checkBarcodes(){
+    private fun checkBarcodes() {
         println(barcodeArray.size)
         barcodeArray.forEach {
             getGoodsByCode(it)
         }
     }
-    private fun getUHTTToken(){
-        val postBody:String = this.soapBegin+
-                "<tns:auth>"+
-                    "<email xsi:type='xsd:string'>ntesla2016@yandex.ru</email>"+
-                    "<password xsi:type='xsd:string'>KOKS4212</password>"+
-                "</tns:auth>"+
-                this.soapEnd
-        val request = Request.Builder()
-                .url("http://www.uhtt.ru/dispatcher/ws/iface")
-                .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-                .header("Content-Type", "text/xml;charset=ISO-8859-1")
-                .addHeader("SOAPAction", "")
-                .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
-            override fun onResponse(call: Call, response: Response) {
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                var strResponse :String  = response.body!!.string()
-                val regex = Regex("<token>.*</token>")
-                val token: String? = regex.find(strResponse)?.value?.removePrefix("<token>")?.removeSuffix("</token>")
-                updateToken(token)
-            }
-        })
-    }
-    private fun updateToken(token: String?){
-        if (token != null) {
-            this.token = token
-        }
-    }
 
-    private fun getGoodsByCode(barcode:String){
-        val postBody:String = this.soapBegin+
-                "<tns:getGoodsByCode>"+
-                "<token xsi:type='xsd:string'>"+this.token+"</token>"+
-                "<code xsi:type='xsd:string'>"+barcode+"</code>"+
-                "</tns:getGoodsByCode>"+
+    private fun getUHTTToken() {
+        val postBody: String = this.soapBegin +
+                "<tns:auth>" +
+                "<email xsi:type='xsd:string'>ntesla2016@yandex.ru</email>" +
+                "<password xsi:type='xsd:string'>KOKS4212</password>" +
+                "</tns:auth>" +
                 this.soapEnd
         val request = Request.Builder()
             .url("http://www.uhtt.ru/dispatcher/ws/iface")
@@ -339,6 +321,42 @@ class ScannerFragment : Fragment() {
             override fun onFailure(call: Call, e: IOException) {
                 e.printStackTrace()
             }
+
+            override fun onResponse(call: Call, response: Response) {
+                if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                var strResponse: String = response.body!!.string()
+                val regex = Regex("<token>.*</token>")
+                val token: String? = regex.find(strResponse)?.value?.removePrefix("<token>")
+                    ?.removeSuffix("</token>")
+                updateToken(token)
+            }
+        })
+    }
+
+    private fun updateToken(token: String?) {
+        if (token != null) {
+            this.token = token
+        }
+    }
+
+    private fun getGoodsByCode(barcode: String) {
+        val postBody: String = this.soapBegin +
+                "<tns:getGoodsByCode>" +
+                "<token xsi:type='xsd:string'>" + this.token + "</token>" +
+                "<code xsi:type='xsd:string'>" + barcode + "</code>" +
+                "</tns:getGoodsByCode>" +
+                this.soapEnd
+        val request = Request.Builder()
+            .url("http://www.uhtt.ru/dispatcher/ws/iface")
+            .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
+            .header("Content-Type", "text/xml;charset=ISO-8859-1")
+            .addHeader("SOAPAction", "")
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
             @RequiresApi(Build.VERSION_CODES.N)
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
@@ -346,14 +364,20 @@ class ScannerFragment : Fragment() {
                 val strResponse: String = response.body!!.string()
                 println(strResponse)
                 val regex = Regex("<Name>.*</Name>")
-                var goods: String? = regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
+                var goods: String? =
+                    regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
                 if (goods != null) {
                     goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
-                    var trashIndex = findTrashType(goods)
-                    requireActivity().runOnUiThread{
+                    val trashIndex = findTrashType(goods)
+                    requireActivity().runOnUiThread {
 
-                        var bundle = Bundle().apply {putSerializable(MapsFragment.TRASH_TYPE,TrashType.fromInt(trashIndex))}
-                        findNavController().navigate(R.id.navigation_maps,bundle)
+                        val bundle = Bundle().apply {
+                            putSerializable(
+                                MapsFragment.TRASH_TYPE,
+                                TrashType.fromInt(trashIndex)
+                            )
+                        }
+                        findNavController().navigate(R.id.navigation_maps, bundle)
                     }
 
                 }
@@ -361,9 +385,9 @@ class ScannerFragment : Fragment() {
         })
     }
 
-    private fun findTrashType(goods : String): Int {
-        for ((index, values) in KeyValue.withIndex()){
-            for (oneString in values){
+    private fun findTrashType(goods: String): Int {
+        for ((index, values) in keyValue.withIndex()) {
+            for (oneString in values) {
                 val regex = Regex(oneString, RegexOption.IGNORE_CASE)
                 if (regex.containsMatchIn(goods))
                     return index
@@ -377,19 +401,21 @@ class ScannerFragment : Fragment() {
         permissions: Array<String>,
         grantResults: IntArray
     ) {
-        if (requestCode == PERMISSION_CAMERA_REQUEST){
-            if ( isCameraPermissionGranted()){
+        if (requestCode == PERMISSION_CAMERA_REQUEST) {
+            if (isCameraPermissionGranted()) {
                 bindCameraUseCases()
-            }
-            else {
+            } else {
                 Log.e(TAG, "no camera permission")
             }
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
     }
-    private fun isCameraPermissionGranted():Boolean{
-        return ContextCompat.checkSelfPermission(requireContext(),
-            Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+
+    private fun isCameraPermissionGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
     }
 
     companion object {
