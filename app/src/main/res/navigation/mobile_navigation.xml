@@ -3,12 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_lenta">
+    app:startDestination="@+id/navigation_articles">
 
     <fragment
-        android:id="@+id/navigation_lenta"
-        android:name="com.example.sberproject.ui.lenta.LentaFragment"
-        tools:layout="@layout/fragment_lenta" >
+        android:id="@+id/navigation_articles"
+        android:name="com.example.sberproject.ui.articles.ArticlesFragment"
+        tools:layout="@layout/fragment_articles" >
         <action
             android:id="@+id/action_navigation_lenta_to_navigation_account"
             app:destination="@id/navigation_account" />
