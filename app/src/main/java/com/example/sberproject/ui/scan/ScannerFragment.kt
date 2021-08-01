@@ -29,7 +29,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.sberproject.TrashType
 import com.example.sberproject.ui.map.MapsFragment
-import com.google.android.gms.maps.MapFragment
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -69,15 +68,12 @@ class ScannerFragment : Fragment() {
     private var scanButton: Button? = null
 
     //just property that signal app that button pressed
-    private var needToScan: Boolean by Delegates.observable(false) { prop, old, new ->
+    private var needToScan: Boolean by Delegates.observable(false) { _, _, new ->
         if (!new) {
             haveCodeInDb = new
             barcodeArray.clear()
         }
     }
-
-    //this property block sending soap request if new barcode equal to old barcode
-    private var prevBarcode: String = ""
 
     private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
             "<SOAP-ENV:Envelope " +
@@ -130,7 +126,7 @@ class ScannerFragment : Fragment() {
         scanButton = container.findViewById(R.id.scanBtn)
 
         //trigger scanning by touch button
-        scanButton?.setOnTouchListener { v, event ->
+        scanButton?.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
 
                 this.needToScan = true
@@ -274,11 +270,11 @@ class ScannerFragment : Fragment() {
                 if (this.needToScan && !haveCodeInDb) {
                     frameCount++
                     barcodes.forEach {
-                        if (frameCount != 10) {
-                            if (prevBarcode != it.rawValue && it.rawValue.length == 13) {
-                                if (!barcodeArray.contains(it.rawValue)) {
-                                    barcodeArray.add(it.rawValue)
-                                }
+                        val rawValue = it.rawValue
+                        if (frameCount != 10 && rawValue != null) {
+                            if (rawValue.length == 13 && !barcodeArray.contains(rawValue)
+                            ) {
+                                barcodeArray.add(rawValue)
                             }
                         } else {
                             if (barcodeArray.isNotEmpty()) {
@@ -324,7 +320,7 @@ class ScannerFragment : Fragment() {
 
             override fun onResponse(call: Call, response: Response) {
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                var strResponse: String = response.body!!.string()
+                val strResponse: String = response.body?.string().toString()
                 val regex = Regex("<token>.*</token>")
                 val token: String? = regex.find(strResponse)?.value?.removePrefix("<token>")
                     ?.removeSuffix("</token>")
@@ -369,17 +365,19 @@ class ScannerFragment : Fragment() {
                 if (goods != null) {
                     goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
                     val trashIndex = findTrashType(goods)
-                    requireActivity().runOnUiThread {
+                    if (trashIndex != -1) {
+                        requireActivity().runOnUiThread {
 
-                        val bundle = Bundle().apply {
-                            putSerializable(
-                                MapsFragment.TRASH_TYPE,
-                                TrashType.fromInt(trashIndex)
-                            )
+                            val bundle = Bundle().apply {
+                                putSerializable(
+                                    MapsFragment.TRASH_TYPE,
+                                    TrashType.fromInt(trashIndex)
+                                )
+                            }
+                            needToScan = false
+                            findNavController().navigate(R.id.navigation_maps, bundle)
                         }
-                        findNavController().navigate(R.id.navigation_maps, bundle)
                     }
-
                 }
             }
         })

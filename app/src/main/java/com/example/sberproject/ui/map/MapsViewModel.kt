@@ -26,14 +26,43 @@ class MapsViewModel(
         mutableRecyclingPlaces.value = recyclingPlacesList
     }
 
-    fun findNearbyRecyclingPlaceFromStart(start: LatLng) {
-        val nearbyRecyclingPlace = getNearbyRecyclingPlace(start)
-        mutableRouteToNearbyRecyclingPlace.value = start to nearbyRecyclingPlace.coordinates
+    fun setSourceAndDestination(source: LatLng, destination: LatLng) {
+        mutableRouteToNearbyRecyclingPlace.value = source to destination
+    }
+
+    fun findNearbyRecyclingPlaceFromStart(source: LatLng) {
+        val nearbyRecyclingPlace = getNearbyRecyclingPlace(source)
+        setSourceAndDestination(source, nearbyRecyclingPlace.coordinates)
     }
 
     fun setTrashType(trashType: TrashType) {
         mutableRecyclingPlaces.value =
             recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+    }
+
+    private val trashTypes by lazy {
+        mutableSetOf<TrashType>()
+    }
+
+    fun addTrashType(trashType: TrashType) {
+        trashTypes.add(trashType)
+        mutableRecyclingPlaces.value = recyclingPlacesList.filter {
+            it.trashTypes.intersect(
+                trashTypes
+            ).isNotEmpty()
+        }
+    }
+
+    fun removeTrashType(trashType: TrashType) {
+        trashTypes.remove(trashType)
+        if (trashTypes.isEmpty())
+            mutableRecyclingPlaces.value = recyclingPlacesList
+        else
+            mutableRecyclingPlaces.value = recyclingPlacesList.filter {
+                it.trashTypes.intersect(
+                    trashTypes
+                ).isNotEmpty()
+            }
     }
 
     private fun getNearbyRecyclingPlace(start: LatLng): RecyclingPlace {
