@@ -1,5 +1,6 @@
 package com.example.sberproject
 
+import com.example.sberproject.ui.articles.Article
 import com.google.android.gms.maps.model.LatLng
 
 object Util {
@@ -68,7 +69,7 @@ object Util {
         recyclingPlaces.map { it.name to it.trashTypes }.toMap()
     }
 
-    val trashTypeToIcon by lazy{
+    val trashTypeToIcon by lazy {
         mapOf(
             TrashType.PAPER to R.drawable.trash_1,
             TrashType.PLASTIC to R.drawable.trash_3,
@@ -202,6 +203,29 @@ object Util {
             ) to R.drawable.marker_1_6_7_8_9_10_13,
             setOf(TrashType.PLASTIC, TrashType.CAPS) to R.drawable.marker_3_12,
             setOf(TrashType.CAPS) to R.drawable.marker_12
+        )
+    }
+
+    val articles by lazy {
+        listOf(
+            Article(
+                "https://www.ecodao.ru/what-is-ecology-adout/",
+                "О чём наука экология?",
+                "Интересно и просто расскажем, что такое экология и о чем эта наука?",
+                "https://lh5.googleusercontent.com/TbDj_27N-EsC6S2aLHtXh48AZlSVgUSHq4aPmyNgLo9M5J0KLXul8rLlypB7kqTTH87bYt-A6Rgp-Sln2a3SADCphSWRRndogi1YPEAzCQQ6Pd02__Ps-ubuOdLH-KBOKe9ReXc"
+            ),
+            Article(
+                "https://trends.rbc.ru/trends/green/5d696a8c9a7947741b7e954d",
+                "Как сортировать мусор дома. Краткая инструкция",
+                "Расскажем, как ввести эту полезную привычку в повседневную жизнь",
+                "https://s0.rbk.ru/v6_top_pics/resized/590xH/media/img/7/03/755851506080037.png"
+            ),
+            Article(
+                "https://nplus1.ru/material/2018/03/22/landfill-gases",
+                "Химическая жизнь мусора",
+                "Что происходит с отходами, когда они попадают на свалку?",
+                "https://nplus1.ru/images/2018/03/22/d8f0749839e914124c13c643c3321bb6.jpg"
+            )
         )
     }
 }
