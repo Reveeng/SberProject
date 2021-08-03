@@ -59,6 +59,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var permissionId = 52
 
+    private var routeLine: PolylineOptions? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.getSerializable(TRASH_TYPE)?.let {
@@ -158,6 +160,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {
                 clear()
+                routeLine?.let{
+                    addPolyline(it)
+                }
                 recyclingPlaces.map {
                     val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
                         BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
@@ -179,10 +184,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
                     }
                 )
         })
-    }
-
-    private fun setRoute(location: Location) {
-
     }
 
     private fun enableMyLocation() {
@@ -216,6 +217,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             10,
             Color.parseColor("#aed6f5")
         )
+        routeLine = line
         googleMap.addPolyline(line)
         setCameraWithCoordinationBounds(googleMap, route)
     }
