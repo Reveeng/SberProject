@@ -55,6 +55,12 @@ class TrashTypesListFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+    }
+
     private fun addTrashTypesViews() {
         for (i in TrashType.values().indices) {
             val name = TrashType.values()[i].toString()

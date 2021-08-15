@@ -5,11 +5,9 @@ import android.location.LocationManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.TrashType
 import com.google.android.gms.maps.model.LatLng
-import kotlinx.coroutines.launch
 
 class MapsViewModel(
     private val recyclingPlacesList: List<RecyclingPlace>
@@ -19,11 +17,15 @@ class MapsViewModel(
         MutableLiveData<List<RecyclingPlace>>()
     }
     val recyclingPlaces: LiveData<List<RecyclingPlace>> = mutableRecyclingPlaces
-    private val mutableRouteToNearbyRecyclingPlace by lazy {
+    private val mutableRouteToRecyclingPlace by lazy {
         MutableLiveData<Pair<LatLng, LatLng>>()
     }
-    val routeToNearbyRecyclingPlace: LiveData<Pair<LatLng, LatLng>> =
-        mutableRouteToNearbyRecyclingPlace
+    val routeToRecyclingPlace: LiveData<Pair<LatLng, LatLng>> =
+        mutableRouteToRecyclingPlace
+    private val mutableRecyclingPlaceInfoToShow by lazy {
+        MutableLiveData<RecyclingPlace>()
+    }
+    val recyclingPlaceToShow: LiveData<RecyclingPlace> = mutableRecyclingPlaceInfoToShow
 
     init {
 //        viewModelScope.launch {
@@ -33,12 +35,13 @@ class MapsViewModel(
     }
 
     fun setSourceAndDestination(source: LatLng, destination: LatLng) {
-        mutableRouteToNearbyRecyclingPlace.value = source to destination
+        mutableRouteToRecyclingPlace.value = source to destination
     }
 
     fun findNearbyRecyclingPlaceFromStart(source: LatLng) {
         val nearbyRecyclingPlace = getNearbyRecyclingPlace(source)
         setSourceAndDestination(source, nearbyRecyclingPlace.coordinates)
+        mutableRecyclingPlaceInfoToShow.value = nearbyRecyclingPlace
     }
 
     fun setTrashType(trashType: TrashType) {
