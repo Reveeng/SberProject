@@ -67,7 +67,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        trashType = TrashType.CLOTHES
         arguments?.getSerializable(TRASH_TYPE)?.let {
             trashType = it as TrashType
         }
