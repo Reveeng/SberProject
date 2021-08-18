@@ -110,6 +110,9 @@ class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
                     else {
                         println("all items"+barcodeArray)
                         val uniqueList = barcodeArray.distinct()
+                        uniqueList.forEach { barcode ->
+                            getGoodsByCode(barcode)
+                        }
                         println("unique items"+uniqueList)
                         }
                     }
