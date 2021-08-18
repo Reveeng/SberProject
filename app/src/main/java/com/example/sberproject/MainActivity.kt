@@ -71,10 +71,15 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_scanner, R.id.navigation_lenta, R.id.navigation_maps, R.id.navigation_account
+                R.id.navigation_scanner, R.id.navigation_articles, R.id.navigation_maps, R.id.navigation_account
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        onBackPressed()
+        return true
     }
 }
