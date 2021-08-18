@@ -13,14 +13,10 @@ import com.example.sberproject.R
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.ActivityInfo
-import android.os.Build
-import android.os.CountDownTimer
-import android.text.Html
 import android.util.DisplayMetrics
 import android.view.MotionEvent
 import android.widget.Button
 import android.widget.RelativeLayout
-import androidx.annotation.RequiresApi
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
@@ -29,29 +25,17 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.sberproject.TrashType
 import com.example.sberproject.ui.map.MapsFragment
+import com.example.sberproject.ui.scan.BarcodeHandler
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
-import okhttp3.*
 import java.util.concurrent.Executors
 import kotlin.IllegalStateException
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.RequestBody.Companion.toRequestBody
-import java.io.IOException
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
-import kotlin.properties.Delegates
 
 class ScannerFragment : Fragment() {
-    private val keyValue =
-        arrayOf(
-            //key value for paper
-            arrayOf("книга", "тетрадь"),
-            //key value for plastic
-            arrayOf("пл.{1}бут", "п.{1}б", "пэт")
-            //TODO: add other key words for trash type
-        )
 
     //objects that need for scaner
     private var cameraSelector: CameraSelector? = null
@@ -67,48 +51,22 @@ class ScannerFragment : Fragment() {
     //button on screen
     private var scanButton: Button? = null
 
-    //just property that signal app that button pressed
-    private var needToScan: Boolean by Delegates.observable(false) { _, _, new ->
-        if (!new) {
-            haveCodeInDb = new
-            barcodeArray.clear()
+    //create barcode handler class
+    private val barcodeHandler: BarcodeHandler = BarcodeHandler { trashType: TrashType ->
+        requireActivity().runOnUiThread {
+            val bundle = Bundle().apply {
+                putSerializable(
+                    MapsFragment.TRASH_TYPE,
+                    trashType
+                )
+            }
+            findNavController().navigate(R.id.navigation_maps, bundle)
         }
     }
 
-    private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
-            "<SOAP-ENV:Envelope " +
-            "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " +
-            "xmlns:SOAP-ENV=\"http://schemas.xmlsoap.org/soap/envelope/\" " +
-            "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
-            "xmlns:tns=\"http://service.uhtt.ru/\">" +
-            "<SOAP-ENV:Body>"
-    private val soapEnd: String = "</SOAP-ENV:Body>" +
-            "</SOAP-ENV:Envelope>"
-    private var token: String = ""
+    fun trashTypeCallback(trashtype:TrashType){
 
-    //ml kit poorly distinguished number like 1,7,4 so i just store all unique barcodes from 10 frames
-    private var barcodeArray: MutableList<String> = arrayListOf()
-
-    //frame counter
-    private var frameCount: Int = 0
-
-    //if db contain barcode stop scanning
-    private var haveCodeInDb: Boolean = false
-
-    //every 60 second need to refresh uhtt token
-    private val timer: CountDownTimer = object : CountDownTimer(60000, 1000) {
-        override fun onTick(millisUntilFinished: Long) {
-            println(millisUntilFinished / 1000)
-        }
-
-        override fun onFinish() {
-            getUHTTToken()
-            this.start()
-        }
     }
-
-    //http client
-    private val client = OkHttpClient()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -128,25 +86,21 @@ class ScannerFragment : Fragment() {
         //trigger scanning by touch button
         scanButton?.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
-
-                this.needToScan = true
-                println(this.needToScan)
+                barcodeHandler.needToScan = true
             }
             if (event.action == MotionEvent.ACTION_UP) {
-                this.needToScan = false
-                println(this.needToScan)
+                barcodeHandler.needToScan = false
             }
             false
         }
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setupCamera()
-        getUHTTToken()
-        timer.start()
+        barcodeHandler.timer.start()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        timer.cancel()
+        barcodeHandler.timer.cancel()
     }
 
     private val screenAspectRatio: Int
@@ -267,23 +221,7 @@ class ScannerFragment : Fragment() {
 
         barcodeScanner.process(inputImage)
             .addOnSuccessListener { barcodes ->
-                if (this.needToScan && !haveCodeInDb) {
-                    frameCount++
-                    barcodes.forEach {
-                        val rawValue = it.rawValue
-                        if (frameCount != 10 && rawValue != null) {
-                            if (rawValue.length == 13 && !barcodeArray.contains(rawValue)
-                            ) {
-                                barcodeArray.add(rawValue)
-                            }
-                        } else {
-                            if (barcodeArray.isNotEmpty()) {
-                                checkBarcodes()
-                            }
-                            frameCount = 0
-                        }
-                    }
-                }
+                barcodeHandler.addNewBarcodes(barcodes)
             }
             .addOnFailureListener {
                 Log.e(TAG, it.message.toString())
@@ -291,107 +229,6 @@ class ScannerFragment : Fragment() {
             .addOnCompleteListener {
                 imageProxy.close()
             }
-    }
-
-    private fun checkBarcodes() {
-        println(barcodeArray.size)
-        barcodeArray.forEach {
-            getGoodsByCode(it)
-        }
-    }
-
-    private fun getUHTTToken() {
-        val postBody: String = this.soapBegin +
-                "<tns:auth>" +
-                "<email xsi:type='xsd:string'>ntesla2016@yandex.ru</email>" +
-                "<password xsi:type='xsd:string'>KOKS4212</password>" +
-                "</tns:auth>" +
-                this.soapEnd
-        val request = Request.Builder()
-            .url("http://www.uhtt.ru/dispatcher/ws/iface")
-            .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-            .header("Content-Type", "text/xml;charset=ISO-8859-1")
-            .addHeader("SOAPAction", "")
-            .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                val strResponse: String = response.body?.string().toString()
-                val regex = Regex("<token>.*</token>")
-                val token: String? = regex.find(strResponse)?.value?.removePrefix("<token>")
-                    ?.removeSuffix("</token>")
-                updateToken(token)
-            }
-        })
-    }
-
-    private fun updateToken(token: String?) {
-        if (token != null) {
-            this.token = token
-        }
-    }
-
-    private fun getGoodsByCode(barcode: String) {
-        val postBody: String = this.soapBegin +
-                "<tns:getGoodsByCode>" +
-                "<token xsi:type='xsd:string'>" + this.token + "</token>" +
-                "<code xsi:type='xsd:string'>" + barcode + "</code>" +
-                "</tns:getGoodsByCode>" +
-                this.soapEnd
-        val request = Request.Builder()
-            .url("http://www.uhtt.ru/dispatcher/ws/iface")
-            .post(postBody.toRequestBody(MEDIA_TYPE_MARKDOWN))
-            .header("Content-Type", "text/xml;charset=ISO-8859-1")
-            .addHeader("SOAPAction", "")
-            .build()
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                e.printStackTrace()
-            }
-
-            @RequiresApi(Build.VERSION_CODES.N)
-            override fun onResponse(call: Call, response: Response) {
-                if (!response.isSuccessful) throw IOException("Unexpected code $response")
-                haveCodeInDb = true
-                val strResponse: String = response.body!!.string()
-                println(strResponse)
-                val regex = Regex("<Name>.*</Name>")
-                var goods: String? =
-                    regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
-                if (goods != null) {
-                    goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
-                    val trashIndex = findTrashType(goods)
-                    if (trashIndex != -1) {
-                        requireActivity().runOnUiThread {
-
-                            val bundle = Bundle().apply {
-                                putSerializable(
-                                    MapsFragment.TRASH_TYPE,
-                                    TrashType.fromInt(trashIndex)
-                                )
-                            }
-                            needToScan = false
-                            findNavController().navigate(R.id.navigation_maps, bundle)
-                        }
-                    }
-                }
-            }
-        })
-    }
-
-    private fun findTrashType(goods: String): Int {
-        for ((index, values) in keyValue.withIndex()) {
-            for (oneString in values) {
-                val regex = Regex(oneString, RegexOption.IGNORE_CASE)
-                if (regex.containsMatchIn(goods))
-                    return index
-            }
-        }
-        return -1
     }
 
     override fun onRequestPermissionsResult(
@@ -421,6 +258,5 @@ class ScannerFragment : Fragment() {
         private const val PERMISSION_CAMERA_REQUEST = 1
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
-        private val MEDIA_TYPE_MARKDOWN = "text/xml; charset=iso-8859-1".toMediaType()
     }
 }
