@@ -10,14 +10,14 @@
         android:name="com.example.sberproject.ui.lenta.LentaFragment"
         tools:layout="@layout/fragment_lenta" >
         <action
-            android:id="@+id/action_navigation_lenta_to_navigation_account"
-            app:destination="@id/navigation_account" />
-        <action
-            android:id="@+id/action_navigation_lenta_to_navigation_setting2"
-            app:destination="@id/navigation_setting" />
-        <action
             android:id="@+id/action_navigation_lenta_to_navigation_browser"
             app:destination="@id/navigation_browser" />
+        <action
+            android:id="@+id/action_navigation_lenta_to_navigation_login"
+            app:destination="@id/navigation_login" />
+        <action
+            android:id="@+id/action_navigation_lenta_to_navigation_setting"
+            app:destination="@id/navigation_setting" />
     </fragment>
 
     <fragment
@@ -35,10 +35,26 @@
             android:id="@+id/action_navigation_scanner_to_navigation_first_instruction"
             app:destination="@id/navigation_first_instruction" />
     </fragment>
+
+    <fragment
+        android:id="@+id/navigation_login"
+        android:name="com.example.sberproject.view.fragments.LoginFragment"
+        tools:layout="@layout/fragment_login" >
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_register"
+            app:destination="@id/navigation_register" />
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_account"
+            app:destination="@id/navigation_account" />
+    </fragment>
     <fragment
         android:id="@+id/navigation_account"
         android:name="com.example.sberproject.view.fragments.AccountFragment"
         tools:layout="@layout/fragment_account" />
+    <fragment
+        android:id="@+id/navigation_register"
+        android:name="com.example.sberproject.view.fragments.RegisterFragment"
+        tools:layout="@layout/fragment_register" />
     <fragment
         android:id="@+id/navigation_setting"
         android:name="com.example.sberproject.view.fragments.SettingFragment"

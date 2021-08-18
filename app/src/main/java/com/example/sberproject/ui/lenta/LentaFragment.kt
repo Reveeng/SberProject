@@ -4,13 +4,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
-import com.example.sberproject.databinding.FragmentLentaBinding
 import com.example.sberproject.R
+import com.example.sberproject.databinding.FragmentLentaBinding
 
 class LentaFragment : Fragment() {
 
@@ -29,8 +26,7 @@ class LentaFragment : Fragment() {
         _binding = FragmentLentaBinding.inflate(inflater, container, false)
         val root: View = binding.root
         binding.accButton.setOnClickListener{
-            findNavController().navigate(R.id.navigation_account)
-
+            findNavController().navigate(R.id.navigation_login)
         }
         binding.setButton.setOnClickListener{
             findNavController().navigate(R.id.navigation_setting)
