@@ -52,20 +52,16 @@ class ScannerFragment : Fragment() {
     private var scanButton: Button? = null
 
     //create barcode handler class
-    private val barcodeHandler: BarcodeHandler = BarcodeHandler { trashType: TrashType ->
+    private val barcodeHandler: BarcodeHandler = BarcodeHandler { bundle: Bundle ->
         requireActivity().runOnUiThread {
-            val bundle = Bundle().apply {
-                putSerializable(
-                    MapsFragment.TRASH_TYPE,
-                    trashType
-                )
-            }
-            findNavController().navigate(R.id.navigation_maps, bundle)
+//            val bundle = Bundle().apply {
+//                putSerializable(
+//                    MapsFragment.TRASH_TYPE,
+//                    trashType
+//                )
+//            }
+            findNavController().navigate(R.id.fragment_debug_info, bundle)
         }
-    }
-
-    fun trashTypeCallback(trashtype:TrashType){
-
     }
 
     override fun onCreateView(

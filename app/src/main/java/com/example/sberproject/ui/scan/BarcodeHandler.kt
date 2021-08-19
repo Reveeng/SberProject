@@ -1,6 +1,7 @@
 package com.example.sberproject.ui.scan
 
 import android.os.Build
+import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.Html
 import com.google.mlkit.vision.barcode.Barcode
@@ -11,7 +12,7 @@ import java.io.IOException
 import kotlin.properties.Delegates
 import com.example.sberproject.TrashType
 
-class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
+class BarcodeHandler(private val TTCallback:(bundle: Bundle)->Unit){
 
     private val keyValue =
         arrayOf(
@@ -21,6 +22,7 @@ class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
             arrayOf("пл.{1}бут", "п.{1}б", "пэт")
             //TODO: add other key words for trash type
         )
+    var bundle = Bundle()
 
     private val soapBegin: String = "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" +
             "<SOAP-ENV:Envelope " +
@@ -34,7 +36,8 @@ class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
 
     private var Utoken: String = ""
     var trashType: TrashType by Delegates.observable(TrashType.OTHER){_,_,new->
-        TTCallback(new)
+        bundle.putString("trash type", new.toString())
+        TTCallback(bundle)
     }
 
     private var barcodeArray: MutableList<String> = arrayListOf()
@@ -108,12 +111,12 @@ class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
                     if (barcode.length != 13) return@barcodeloop
                     if (barcodeArray.size <= 10) barcodeArray.add(barcode)
                     else {
-                        println("all items"+barcodeArray)
+                        println("all items $barcodeArray")
                         val uniqueList = barcodeArray.distinct()
                         uniqueList.forEach { barcode ->
                             getGoodsByCode(barcode)
                         }
-                        println("unique items"+uniqueList)
+                        println("unique items $uniqueList")
                         }
                     }
                 }
@@ -141,15 +144,20 @@ class BarcodeHandler(private val TTCallback:(trashType: TrashType)->Unit){
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 haveCodeInDb = true
                 val strResponse: String = response.body!!.string()
-                println(strResponse)
+                println("response is $strResponse")
                 val regex = Regex("<Name>.*</Name>")
                 var goods: String? =
                     regex.find(strResponse)?.value?.removePrefix("<Name>")?.removeSuffix("</Name>")
+
                 if (goods != null) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        bundle.putString("barcode", barcode)
+                        bundle.putString("rawinfo", goods)
                         goods = Html.fromHtml(goods, Html.FROM_HTML_MODE_LEGACY).toString()
+                        bundle.putString("info", goods)
                     }
                     trashType =  findTrashType(goods)
+                    println("trashType is $trashType")
                     needToScan = false
                 }
             }

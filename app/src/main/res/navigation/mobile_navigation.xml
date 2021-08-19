@@ -37,6 +37,9 @@
         <action
             android:id="@+id/action_navigation_scanner_to_navigation_maps"
             app:destination="@id/navigation_maps" />
+        <action
+            android:id="@+id/action_navigation_scanner_to_fragment_debug_info"
+            app:destination="@id/fragment_debug_info" />
     </fragment>
     <fragment
         android:id="@+id/navigation_account"
@@ -58,4 +61,9 @@
             android:id="@+id/action_navigation_first_instruction_to_navigation_maps"
             app:destination="@id/navigation_maps" />
     </fragment>
+    <fragment
+        android:id="@+id/fragment_debug_info"
+        android:name="com.example.sberproject.fragment_debug_info"
+        android:label="fragment_debug_info"
+        tools:layout="@layout/fragment_debug_info" />
 </navigation>
