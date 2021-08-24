@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.sberproject.MainActivityCallback
 import com.example.sberproject.R
 import com.example.sberproject.Util
 import com.example.sberproject.databinding.FragmentArticlesBinding
@@ -34,12 +35,6 @@ class ArticlesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentArticlesBinding.inflate(inflater, container, false)
-        binding.accButton.setOnClickListener {
-            findNavController().navigate(R.id.navigation_account)
-        }
-        binding.setButton.setOnClickListener {
-            findNavController().navigate(R.id.navigation_setting)
-        }
         return binding.root
     }
 
@@ -48,6 +43,11 @@ class ArticlesFragment : Fragment() {
         viewModel.articles.observe(viewLifecycleOwner, { articles ->
             binding.recyclerView.adapter = ArticleAdapter(articles) { articleOnClick(it) }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivityCallback?)?.setActionBarTitle("Новости")
     }
 
     private fun articleOnClick(article: Article) {

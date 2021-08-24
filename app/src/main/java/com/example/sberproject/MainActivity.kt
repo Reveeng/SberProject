@@ -4,18 +4,15 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.sberproject.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
-
-
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), MainActivityCallback {
 
     private lateinit var binding: ActivityMainBinding
 
-//    lateinit var  fusedLocationProviderClient: FusedLocationProviderClient
+    //    lateinit var  fusedLocationProviderClient: FusedLocationProviderClient
 //    lateinit var  locationRequest: LocationRequest
 //    // just an int that must be unique
 //    private var PERMISSION_ID = 52
@@ -71,15 +68,29 @@ class MainActivity : AppCompatActivity() {
         // menu should be considered as top level destinations.
         val appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.navigation_scanner, R.id.navigation_articles, R.id.navigation_maps, R.id.navigation_account
+                R.id.navigation_scanner,
+                R.id.navigation_articles,
+                R.id.navigation_maps,
+//                R.id.navigation_account
             )
         )
-        setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+        binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        setSupportActionBar(binding.toolbar)
+
+        binding.accButton.setOnClickListener {
+            navController.navigate(R.id.navigation_account)
+        }
+        binding.setButton.setOnClickListener {
+            navController.navigate(R.id.navigation_setting)
+        }
+        binding.toolbar.setNavigationOnClickListener {
+            onBackPressed()
+        }
     }
 
-    override fun onSupportNavigateUp(): Boolean {
-        onBackPressed()
-        return true
+    override fun setActionBarTitle(title: String) {
+        supportActionBar?.title = title
     }
 }

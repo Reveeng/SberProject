@@ -20,10 +20,7 @@ import com.akexorcist.googledirection.model.Direction
 import com.akexorcist.googledirection.model.Route
 import com.akexorcist.googledirection.util.DirectionConverter
 import com.akexorcist.googledirection.util.execute
-import com.example.sberproject.R
-import com.example.sberproject.RecyclingPlace
-import com.example.sberproject.TrashType
-import com.example.sberproject.Util
+import com.example.sberproject.*
 import com.example.sberproject.databinding.FragmentMapsBinding
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -99,6 +96,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         viewModel.recyclingPlaceToShow.observe(viewLifecycleOwner, {
             showInfoSheetAboutRecyclingPlace(it)
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivityCallback?)?.setActionBarTitle("Карта")
     }
 
     private fun requestPermission() {
