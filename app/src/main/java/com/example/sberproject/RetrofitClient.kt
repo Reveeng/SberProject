@@ -7,17 +7,21 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    val RECYCLING_PLACES_SERVICE by lazy{
-        val gson = GsonBuilder().create()
+    val RECYCLING_PLACES_SERVICE by lazy {
+        val baseUrl = "http://158.101.217.50/city/"
+        val gson = GsonBuilder()
+            .setLenient()
+            .registerTypeAdapter(RecyclingPlace::class.java, RecyclingPlaceDeserializer())
+            .create()
 
         Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl(baseUrl)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(RecyclingPlacesApi::class.java)
     }
 
-    val ARTICLES_SERVICE by lazy{
+    val ARTICLES_SERVICE by lazy {
         val gson = GsonBuilder().create()
 
         Retrofit.Builder()

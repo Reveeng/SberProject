@@ -9,3 +9,4 @@ data class RecyclingPlace(
     val coordinates: LatLng,
     val trashTypes: Set<TrashType>
 ) : Serializable
+

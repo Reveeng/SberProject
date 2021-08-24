@@ -5,13 +5,14 @@ import android.location.LocationManager
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.TrashType
 import com.google.android.gms.maps.model.LatLng
+import kotlinx.coroutines.launch
 
 class MapsViewModel(
-    private val recyclingPlacesList: List<RecyclingPlace>
-//    private val recyclingPlacesApi: RecyclingPlacesApi
+    private val recyclingPlacesApi: RecyclingPlacesApi
 ) : ViewModel() {
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
@@ -27,11 +28,13 @@ class MapsViewModel(
     }
     val recyclingPlaceToShow: LiveData<RecyclingPlace> = mutableRecyclingPlaceInfoToShow
 
+    private lateinit var recyclingPlacesList: List<RecyclingPlace>
+
     init {
-//        viewModelScope.launch {
-//            mutableRecyclingPlaces.value = recyclingPlacesApi.getRecyclingPlaces()
-//        }
-        mutableRecyclingPlaces.value = recyclingPlacesList
+        viewModelScope.launch {
+            recyclingPlacesList = recyclingPlacesApi.getRecyclingPlaces("ekaterinburg")
+            mutableRecyclingPlaces.value = recyclingPlacesList
+        }
     }
 
     fun setSourceAndDestination(source: LatLng, destination: LatLng) {
