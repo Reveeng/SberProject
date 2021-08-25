@@ -2,6 +2,7 @@ package com.example.sberproject.ui.map
 
 import android.Manifest
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.Color
 import android.location.Location
 import android.os.Build
@@ -122,6 +123,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
             moveCamera(CameraUpdateFactory.zoomTo(12.0F))
             moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
         }
+        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES)
+            googleMap.setMapStyle(
+                MapStyleOptions.loadRawResourceStyle(
+                    requireContext(),
+                    R.raw.style_json
+                )
+            )
 
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {

@@ -26,7 +26,7 @@
             android:layout_gravity="end"
             android:layout_margin="8dp"
             android:background="#00000000"
-            android:src="@drawable/round_account_circle_black_36" />
+            android:src="@drawable/ic_baseline_account_circle_24" />
 
     </androidx.appcompat.widget.Toolbar>
 
