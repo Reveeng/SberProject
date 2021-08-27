@@ -31,9 +31,11 @@ import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
+import com.google.maps.android.clustering.ClusterManager
 
 
-class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickListener,
+class MapsFragment : Fragment(), OnMapReadyCallback,
+    GoogleMap.OnMarkerClickListener,
     MapFragmentCallback {
     companion object {
         const val TRASH_TYPE = "trash type"
@@ -59,9 +61,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
 
     private var routeLine: Polyline? = null
 
-    private val markerToRecyclingPlace by lazy {
-        mutableMapOf<Marker, RecyclingPlace>()
-    }
+    private lateinit var clusterManager: ClusterManager<RecyclingPlacesCluster>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -122,6 +122,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         googleMap.run {
             moveCamera(CameraUpdateFactory.zoomTo(12.0F))
             moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
+            clusterManager =
+                RecyclingPlacesClusterManager(requireActivity(), this) { onMarkerClick(it) }
+            clusterManager.renderer =
+                RecyclingPlacesClusterRender(requireContext(), this, clusterManager)
+            setOnCameraIdleListener(clusterManager)
+            setOnMarkerClickListener(clusterManager)
         }
         val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
         if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES)
@@ -135,17 +141,8 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {
                 clear()
-//                routeLine?.let {
-//                    addPolyline(it.)
-//                }
-                recyclingPlaces.map {
-                    val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
-                        BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
-                    else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
-                    val marker = addMarker(
-                        MarkerOptions().position(it.coordinates).title(it.name).icon(icon)
-                    )
-                    markerToRecyclingPlace[marker] = it
+                recyclingPlaces.forEach {
+                    clusterManager.addItem(RecyclingPlacesCluster(it))
                 }
             }
         })
@@ -215,7 +212,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback, GoogleMap.OnMarkerClickList
     }
 
     override fun onMarkerClick(marker: Marker): Boolean {
-        markerToRecyclingPlace[marker]?.let {
+        Util.markerToRecyclingPlace[marker]?.let {
             showInfoSheetAboutRecyclingPlace(it)
         }
         return true

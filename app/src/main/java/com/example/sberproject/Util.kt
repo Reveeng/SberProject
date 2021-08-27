@@ -2,6 +2,7 @@ package com.example.sberproject
 
 import com.example.sberproject.ui.articles.Article
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 
 object Util {
     val recyclingPlaces by lazy {
@@ -234,5 +235,9 @@ object Util {
                 "https://nplus1.ru/images/2018/03/22/d8f0749839e914124c13c643c3321bb6.jpg"
             )
         )
+    }
+
+    val markerToRecyclingPlace by lazy {
+        mutableMapOf<Marker, RecyclingPlace>()
     }
 }
