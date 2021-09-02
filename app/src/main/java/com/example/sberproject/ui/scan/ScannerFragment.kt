@@ -54,12 +54,6 @@ class ScannerFragment : Fragment() {
     //create barcode handler class
     private val barcodeHandler: BarcodeHandler = BarcodeHandler { bundle: Bundle ->
         requireActivity().runOnUiThread {
-//            val bundle = Bundle().apply {
-//                putSerializable(
-//                    MapsFragment.TRASH_TYPE,
-//                    trashType
-//                )
-//            }
             findNavController().navigate(R.id.fragment_debug_info, bundle)
         }
     }
@@ -91,12 +85,12 @@ class ScannerFragment : Fragment() {
         }
         activity?.requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
         setupCamera()
-        barcodeHandler.timer.start()
+//        barcodeHandler.timer.start()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        barcodeHandler.timer.cancel()
+//        barcodeHandler.timer.cancel()
     }
 
     private val screenAspectRatio: Int
