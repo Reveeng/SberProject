@@ -6,25 +6,28 @@
     android:layout_height="match_parent"
     tools:context=".ui.scan.ScannerFragment">
 
-    <com.budiyev.android.codescanner.CodeScannerView
+    <androidx.camera.view.PreviewView
+        android:id="@+id/preview_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/scanBtn"
+        style="@style/Widget.MaterialComponents.ExtendedFloatingActionButton"
+        app:cornerRadius="28dp"
+        app:backgroundTint="#00000000"
+        app:strokeWidth="3dp"
+        app:strokeColor="#FAFAFA"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:id="@+id/scanner_view"
-        app:autoFocusButtonColor="@color/white"
-        app:autoFocusButtonVisible="true"
-        app:flashButtonColor="@color/white"
-        app:flashButtonVisible="true"
-        app:maskColor="#79000000"/>
-    <TextView
-        android:id="@+id/tw_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/scanner_view"
-        android:layout_centerHorizontal="true"
-        android:layout_margin="20dp"
-        android:text="@string/tw_text"
-        android:textColor="@color/black"/>
+        android:layout_alignBottom="@+id/preview_view"
+        android:layout_marginBottom="100dp"
+        />
+
+
 
 </RelativeLayout>

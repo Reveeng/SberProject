@@ -25,5 +25,6 @@ enum class TrashType {
                 OTHER to "Иное"
             )
         }
+        fun fromInt(value: Int) = TrashType.values().first { it.ordinal == value }
     }
 }
