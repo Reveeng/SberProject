@@ -98,7 +98,7 @@ object Util {
     val trashTypeToMarker by lazy {
         mapOf(
             setOf(TrashType.PAPER) to R.drawable.marker_1,
-            setOf(TrashType.GLASS) to R.drawable.marker_3,
+            setOf(TrashType.PLASTIC) to R.drawable.marker_3,
             setOf(TrashType.METAL) to R.drawable.marker_4,
             setOf(TrashType.CLOTHES) to R.drawable.marker_5,
             setOf(TrashType.OTHER) to R.drawable.marker_6,
@@ -135,8 +135,8 @@ object Util {
                 TrashType.CLOTHES,
                 TrashType.OTHER,
                 TrashType.APPLIANCES,
-                TrashType.CAPS,
-                TrashType.TIRES
+                TrashType.TETRA_PACK,
+                TrashType.CAPS
             ) to R.drawable.marker_1_2_3_4_5_6_10_11_12,
             setOf(
                 TrashType.PAPER,
@@ -145,8 +145,8 @@ object Util {
                 TrashType.METAL,
                 TrashType.CLOTHES,
                 TrashType.OTHER,
+                TrashType.BATTERIES,
                 TrashType.APPLIANCES,
-                TrashType.TETRA_PACK,
                 TrashType.CAPS
             ) to R.drawable.marker_1_2_3_4_5_6_8_10_12,
             setOf(TrashType.PAPER, TrashType.PLASTIC) to R.drawable.marker_1_3,
