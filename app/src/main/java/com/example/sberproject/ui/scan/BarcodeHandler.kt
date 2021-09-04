@@ -35,6 +35,7 @@ class BarcodeHandler(private val TTCallback:(bundle: Bundle)->Unit){
                         println("all items $barcodeArray")
                         val uniqueList = barcodeArray.distinct()
                         uniqueList.forEach { barcode ->
+                            haveCodeInDb = true
                             getGoodsByCode(barcode)
                         }
                         println("unique items $uniqueList")
