@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.Color
+import android.location.Geocoder
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
@@ -32,6 +33,7 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 import com.google.maps.android.clustering.ClusterManager
+import java.util.*
 
 
 class MapsFragment : Fragment(), OnMapReadyCallback,
@@ -56,7 +58,6 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
     private lateinit var viewModel: MapsViewModel
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
 
-    private var defaultLocation = LatLng(56.83556279777945, 60.61052534309914)
     private var permissionId = 52
 
     private var routeLine: Polyline? = null
@@ -120,12 +121,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         this.googleMap = googleMap
         enableMyLocation()
         googleMap.run {
-            moveCamera(CameraUpdateFactory.zoomTo(12.0F))
-            moveCamera(CameraUpdateFactory.newLatLng(defaultLocation))
             clusterManager =
                 RecyclingPlacesClusterManager(requireActivity(), this) { onMarkerClick(it) }
             clusterManager.renderer =
-                RecyclingPlacesClusterRender(requireContext(), this, clusterManager)
+                RecyclingPlacesClusterRender(requireActivity(), this, clusterManager)
             setOnCameraIdleListener(clusterManager)
             setOnMarkerClickListener(clusterManager)
         }
@@ -141,9 +140,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
             googleMap.run {
                 clear()
+                clusterManager.clearItems()
                 recyclingPlaces.forEach {
                     clusterManager.addItem(RecyclingPlacesCluster(it))
                 }
+                clusterManager.cluster()
             }
         })
 
@@ -176,7 +177,20 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
             val task: Task<Location> = fusedLocationProviderClient.lastLocation
             task.addOnSuccessListener {
                 if (it != null) {
+                    val city = Geocoder(requireContext(), Locale.getDefault()).getFromLocation(
+                        it.latitude,
+                        it.longitude,
+                        1
+                    )[0].locality
+
+                    viewModel.setCity(city)
+
                     val current = LatLng(it.latitude, it.longitude)
+
+                    googleMap.run {
+                        moveCamera(CameraUpdateFactory.zoomTo(12.0F))
+                        moveCamera(CameraUpdateFactory.newLatLng(current))
+                    }
                     trashType?.let {
                         viewModel.findNearbyRecyclingPlaceFromStart(current)
                     }

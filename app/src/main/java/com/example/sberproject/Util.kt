@@ -5,6 +5,11 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 
 object Util {
+    val cityNames by lazy{
+        mapOf(
+            "Екатеринбург" to "ekaterinburg"
+        )
+    }
     val recyclingPlaces by lazy {
         listOf(
             RecyclingPlace(

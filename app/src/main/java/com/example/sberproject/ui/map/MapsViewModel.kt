@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.TrashType
+import com.example.sberproject.Util
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
@@ -28,14 +29,11 @@ class MapsViewModel(
     }
     val recyclingPlaceToShow: LiveData<RecyclingPlace> = mutableRecyclingPlaceInfoToShow
 
-    private lateinit var recyclingPlacesList: List<RecyclingPlace>
-
-    init {
-        viewModelScope.launch {
-            recyclingPlacesList = recyclingPlacesApi.getRecyclingPlaces("ekaterinburg")
-            mutableRecyclingPlaces.value = recyclingPlacesList
-        }
+    private val trashTypes by lazy {
+        mutableSetOf<TrashType>()
     }
+
+    private lateinit var recyclingPlacesList: List<RecyclingPlace>
 
     fun setSourceAndDestination(source: LatLng, destination: LatLng) {
         mutableRouteToRecyclingPlace.value = source to destination
@@ -50,10 +48,6 @@ class MapsViewModel(
     fun setTrashType(trashType: TrashType) {
         mutableRecyclingPlaces.value =
             recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
-    }
-
-    private val trashTypes by lazy {
-        mutableSetOf<TrashType>()
     }
 
     fun addTrashType(trashType: TrashType) {
@@ -99,5 +93,14 @@ class MapsViewModel(
             return it.first
         }
         throw Exception("There are no recycling places")
+    }
+
+    fun setCity(city: String) {
+        Util.cityNames[city]?.let {
+            viewModelScope.launch {
+                recyclingPlacesList = recyclingPlacesApi.getRecyclingPlaces(it)
+                mutableRecyclingPlaces.value = recyclingPlacesList
+            }
+        }
     }
 }
