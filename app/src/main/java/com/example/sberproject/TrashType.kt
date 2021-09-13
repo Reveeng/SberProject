@@ -25,6 +25,14 @@ enum class TrashType {
                 OTHER to "Иное"
             )
         }
+
+        private val stringToTrashType by lazy {
+            trashTypeToString.map { it.value to it.key }.toMap()
+        }
+
         fun fromInt(value: Int) = TrashType.values().first { it.ordinal == value }
+
+        fun fromString(value: String) =
+            stringToTrashType[value] ?: throw Exception("Unknown trash type")
     }
 }

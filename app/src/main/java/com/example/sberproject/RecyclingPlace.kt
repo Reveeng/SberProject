@@ -7,6 +7,5 @@ data class RecyclingPlace(
     val name: String,
     val information: String,
     val coordinates: LatLng,
-    val trashTypes: Set<TrashType>
+    val trashTypes: Set<TrashType>,
 ) : Serializable
-

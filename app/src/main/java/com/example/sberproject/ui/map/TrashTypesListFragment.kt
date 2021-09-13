@@ -34,7 +34,7 @@ class TrashTypesListFragment : Fragment() {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(
             requireActivity(),
-            MapsViewModelFactory()
+            MapsViewModelFactory(requireContext())
         ).get(MapsViewModel::class.java)
     }
 

@@ -71,7 +71,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         }
         viewModel = ViewModelProvider(
             requireActivity(),
-            MapsViewModelFactory()
+            MapsViewModelFactory(requireContext())
         ).get(MapsViewModel::class.java)
     }
 
@@ -143,6 +143,10 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
                 clusterManager.clearItems()
                 recyclingPlaces.forEach {
                     clusterManager.addItem(RecyclingPlacesCluster(it))
+//                    val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
+//                        BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
+//                    else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
+//                    Util.markerToRecyclingPlace[addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))] =it
                 }
                 clusterManager.cluster()
             }

@@ -9,11 +9,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.TrashType
 import com.example.sberproject.Util
+import com.example.sberproject.ui.map.data.RecyclingPlacesRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
 class MapsViewModel(
-    private val recyclingPlacesApi: RecyclingPlacesApi
+//    private val recyclingPlacesApi: RecyclingPlacesApi
+    private val repository: RecyclingPlacesRepository
 ) : ViewModel() {
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
@@ -98,8 +100,7 @@ class MapsViewModel(
     fun setCity(city: String) {
         Util.cityNames[city]?.let {
             viewModelScope.launch {
-                recyclingPlacesList = recyclingPlacesApi.getRecyclingPlaces(it)
-                mutableRecyclingPlaces.value = recyclingPlacesList
+                mutableRecyclingPlaces.value = repository.getRecyclingPlaces(it)
             }
         }
     }

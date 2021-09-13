@@ -1,7 +1,7 @@
 package com.example.sberproject
 
 import com.example.sberproject.ui.articles.ArticlesApi
-import com.example.sberproject.ui.map.RecyclingPlacesApi
+import com.example.sberproject.ui.map.data.RecyclingPlacesApi
 import com.google.gson.GsonBuilder
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
