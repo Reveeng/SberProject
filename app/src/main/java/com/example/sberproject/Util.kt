@@ -7,79 +7,9 @@ import com.google.android.gms.maps.model.Marker
 object Util {
     val cityNames by lazy{
         mapOf(
-            "Екатеринбург" to "ekaterinburg"
+            "Екатеринбург" to "ekaterinburg",
+            "Москва" to "moscow"
         )
-    }
-    val recyclingPlaces by lazy {
-        listOf(
-            RecyclingPlace(
-                "Предприятие комплексного решения проблем промышленных отходов, ЕМУП",
-                "Можно сдать: -ртутные лампы (люминесцентные и компактные энергосберегающие); ртутные термометры и другие ртутьсодержащие приборы; -малогабаритные источники тока (отработанные батарейки и аккумуляторы); -бытовую, компьютерную технику и оргтехнику. -отработанные автомобильные аккумуляторы.\n",
-                LatLng(56.83770976967497, 60.60828874594135),
-                setOf(
-                    TrashType.LAMPS,
-                    TrashType.BATTERIES,
-                    TrashType.HAZARDOUS_WASTE,
-                    TrashType.OTHER
-                )
-            ),
-            RecyclingPlace(
-                "Ново-Тихвинский женский монастырь",
-                "принимают ношеную чистую целую одежду (взрослую и детскую, обувь), игрушки, книги.",
-                LatLng(56.822700129595944, 60.59999966912793),
-                setOf(TrashType.PAPER, TrashType.CLOTHES, TrashType.OTHER)
-            ),
-            RecyclingPlace(
-                "#НЕМУЗЕЙМУСОРА",
-                "",
-                LatLng(56.83990041333704, 60.5940305421064),
-                setOf(
-                    TrashType.PLASTIC,
-                    TrashType.PAPER,
-                    TrashType.CLOTHES,
-                    TrashType.GLASS,
-                    TrashType.METAL,
-                    TrashType.APPLIANCES,
-                    TrashType.TETRA_PACK,
-                    TrashType.CAPS,
-                    TrashType.OTHER
-                )
-            ),
-            RecyclingPlace(
-                "Экотранс",
-                "принимают сырье от населения от 1 кг Пластик: пэт бутылки, кеги, упаковка от бытовой химии, мешки, канистры, бампера автомобильные и пподкрылки, канистры, ящики молочные Бумага: гофро картон, архивы, газеты. Пленка: ПВД, стрейч. Алюминиевая банка. Другое:деревянные поддоны, коробки из под бананов.",
-                LatLng(56.870451054508095, 60.64722042492072),
-                setOf(TrashType.PAPER, TrashType.PLASTIC, TrashType.METAL)
-            ),
-            RecyclingPlace(
-                "Love Republic",
-                "В контейнеры мы принимаем одежду, обувь, сумки и аксессуары кроме нижнего белья, носков и колготок. Пожалуйста, постирайте вещи перед сдачей!",
-                LatLng(56.85297554287459, 60.55090837094209),
-                setOf(TrashType.CLOTHES)
-            ),
-            RecyclingPlace(
-                "Леруа Мерлен",
-                "Принимают люминесцентные лампы, батарейки, светодиодные лампы.",
-                LatLng(56.8293143834812, 60.51606056909486),
-                setOf(TrashType.LAMPS, TrashType.BATTERIES)
-            ),
-            RecyclingPlace(
-                "Аккумуляторный мир",
-                "автомобильные и мотоциклетные аккумуляторы, дают скидку на покупку нового аккумулятора",
-                LatLng(56.830657070261054, 60.632205642105994),
-                setOf(TrashType.HAZARDOUS_WASTE, TrashType.OTHER)
-            )
-        )
-    }
-
-    val trashTypeToRecyclerPlaces by lazy {
-        val result = TrashType.values().map { it to mutableListOf<RecyclingPlace>() }.toMap()
-        recyclingPlaces.map { rp -> rp.trashTypes.map { result[it]?.add(rp) } }
-        result
-    }
-
-    val recyclingPlaceToTrashTypes by lazy {
-        recyclingPlaces.map { it.name to it.trashTypes }.toMap()
     }
 
     val trashTypeToIcon by lazy {
