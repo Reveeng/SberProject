@@ -16,7 +16,6 @@ class ArticleAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(article: Article) {
             binding.articleTitle.text = article.title
-            binding.articleDescription.text = article.description
             Glide.with(binding.root)
                 .load(article.imageUrl)
                 .into(binding.articleImage)
