@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.example.sberproject.databinding.ArticleItemBinding
 
 class ArticleAdapter(
-    private val articles: List<Article>,
+    private val articles: MutableList<Article>,
     private val onClick: (Article) -> Unit
 ) : RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder>() {
     class ArticleViewHolder(

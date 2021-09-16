@@ -8,9 +8,10 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.example.sberproject.MainActivityCallback
 import com.example.sberproject.R
-import com.example.sberproject.Util
+import com.example.sberproject.RetrofitClient
 import com.example.sberproject.databinding.FragmentArticlesBinding
 import com.example.sberproject.view.fragments.BrowserFragment
 
@@ -24,8 +25,7 @@ class ArticlesFragment : Fragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ArticlesViewModel(Util.articles) as T
-//                return ArticlesViewModel(RetrofitClient.ARTICLES_SERVICE) as T
+                return ArticlesViewModel(RetrofitClient.ARTICLES_SERVICE) as T
             }
         }).get(ArticlesViewModel::class.java)
     }
@@ -35,13 +35,22 @@ class ArticlesFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentArticlesBinding.inflate(inflater, container, false)
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                super.onScrolled(recyclerView, dx, dy)
+                if (!recyclerView.canScrollVertically(1))
+                    viewModel.loadMoreArticles()
+            }
+        })
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.articles.observe(viewLifecycleOwner, { articles ->
-            binding.recyclerView.adapter = ArticleAdapter(articles) { articleOnClick(it) }
+            if (binding.recyclerView.adapter == null)
+                binding.recyclerView.adapter = ArticleAdapter(articles) { articleOnClick(it) }
+            binding.recyclerView.adapter?.notifyItemRangeInserted(articles.size - 10, 10)
         })
     }
 

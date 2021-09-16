@@ -22,10 +22,10 @@ object RetrofitClient {
     }
 
     val ARTICLES_SERVICE by lazy {
-        val gson = GsonBuilder().create()
+        val gson = GsonBuilder().setLenient().create()
 
         Retrofit.Builder()
-            .baseUrl("")
+            .baseUrl("http://158.101.217.50/news/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(ArticlesApi::class.java)
