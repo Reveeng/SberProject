@@ -14,8 +14,7 @@ import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
 class MapsViewModel(
-//    private val recyclingPlacesApi: RecyclingPlacesApi
-    private val repository: RecyclingPlacesRepository
+    //private val repository: RecyclingPlacesRepository
 ) : ViewModel() {
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
@@ -35,9 +34,15 @@ class MapsViewModel(
         mutableSetOf<TrashType>()
     }
 
+    private val mutableBuildRoute by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val buildRoute: LiveData<Event<Int>> = mutableBuildRoute
+
     private lateinit var recyclingPlacesList: List<RecyclingPlace>
 
     fun setSourceAndDestination(source: LatLng, destination: LatLng) {
+        mutableBuildRoute.value = Event(0)
         mutableRouteToRecyclingPlace.value = source to destination
     }
 
@@ -47,9 +52,19 @@ class MapsViewModel(
         mutableRecyclingPlaceInfoToShow.value = nearbyRecyclingPlace
     }
 
-    fun setTrashType(trashType: TrashType) {
-        mutableRecyclingPlaces.value =
-            recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+//    private val mutableTrashType by lazy{
+//        MutableLiveData<Event<TrashType>>()
+//    }
+//    val trashType: LiveData<Event<TrashType>> = mutableTrashType
+
+    suspend fun setTrashType(trashType: TrashType) {
+
+//        this.trashType = trashType
+
+       // viewModelScope.launch {
+            mutableRecyclingPlaces.value =
+                recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+       // }
     }
 
     fun addTrashType(trashType: TrashType) {
@@ -97,11 +112,44 @@ class MapsViewModel(
         throw Exception("There are no recycling places")
     }
 
-    fun setCity(city: String) {
-        Util.cityNames[city]?.let {
-            viewModelScope.launch {
-                mutableRecyclingPlaces.value = repository.getRecyclingPlaces(it)
-            }
-        }
+    suspend fun setCity(city: String) {
+        //Util.cityNames[city]?.let {
+            //viewModelScope.launch {
+                //recyclingPlacesList = repository.getRecyclingPlaces(it)
+                recyclingPlacesList = Util.recyclingPlaces
+                mutableRecyclingPlaces.value = recyclingPlacesList
+//                trashType?.let {
+//                    mutableRecyclingPlaces.value =
+//                        recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+//                    findNearbyRecyclingPlaceFromStart(source)
+//                }
+           // }
+        //}
+    }
+
+    private val mutableClickOnCloseInfoSheet by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val clickOnCloseInfoSheet: LiveData<Event<Int>> = mutableClickOnCloseInfoSheet
+    private val mutableClickOnBuildRoute by lazy {
+        MutableLiveData<Event<RecyclingPlace>>()
+    }
+    val clickOnBuildRoute: LiveData<Event<RecyclingPlace>> = mutableClickOnBuildRoute
+    private val mutableResetRoute by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val resetRoute: LiveData<Event<Int>> = mutableResetRoute
+
+    fun clickOnCloseInfoSheet() {
+        mutableClickOnCloseInfoSheet.value = Event(0)
+    }
+
+    fun clickOnBuildRoute(recyclingPlace: RecyclingPlace) {
+        mutableClickOnBuildRoute.value = Event(recyclingPlace)
+    }
+
+    fun resetRoute() {
+        mutableResetRoute.value = Event(0)
+        mutableRecyclingPlaces.value = recyclingPlacesList
     }
 }

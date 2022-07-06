@@ -6,7 +6,7 @@ import com.example.sberproject.TrashType
 class TrashTypesSetConverter {
     @TypeConverter
     fun fromTrashTypesSet(trashTypesSet: Set<TrashType>): String {
-        return trashTypesSet.map { it.toString() }.reduce { a, b -> "$a,$b" }
+        return trashTypesSet.map { it.toStringUI() }.reduce { a, b -> "$a,$b" }
     }
 
     @TypeConverter

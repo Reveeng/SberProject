@@ -1,4 +1,4 @@
-package com.example.sberproject.ui.map
+package com.example.sberproject.view.fragments
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -12,17 +12,21 @@ import android.widget.LinearLayout
 import android.widget.Space
 import android.widget.TextView
 import androidx.core.graphics.drawable.toDrawable
+import androidx.core.os.bundleOf
+import androidx.core.view.children
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
+import com.example.sberproject.R
 import com.example.sberproject.TrashType
 import com.example.sberproject.Util
-import com.example.sberproject.databinding.FragmentTrashTypesListBinding
-import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.example.sberproject.databinding.FragmentUndefinedTrashTypeBinding
 
-class TrashTypesListFragment : Fragment() {
-    private var _binding: FragmentTrashTypesListBinding? = null
+class UndefinedTrashTypeFragment : Fragment() {
+    private var _binding: FragmentUndefinedTrashTypeBinding? = null
     private val binding get() = _binding!!
-    private lateinit var viewModel: MapsViewModel
+    private lateinit var viewModel: UndefinedTrashTypeViewModel
     private val viewToNotSelectedToSelected by lazy {
         mutableMapOf<View, Pair<Drawable, Drawable>>()
     }
@@ -32,10 +36,12 @@ class TrashTypesListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(
-            requireActivity(),
-            MapsViewModelFactory(requireContext())
-        ).get(MapsViewModel::class.java)
+        viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
+            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+                @Suppress("UNCHECKED_CAST")
+                return UndefinedTrashTypeViewModel() as T
+            }
+        }).get(UndefinedTrashTypeViewModel::class.java)
     }
 
     override fun onCreateView(
@@ -43,22 +49,27 @@ class TrashTypesListFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentTrashTypesListBinding.inflate(inflater, container, false)
+        _binding = FragmentUndefinedTrashTypeBinding.inflate(inflater, container, false)
         addTrashTypesViews()
         addInvisibleViews()
-        binding.trashTypesListTitle.setOnClickListener {
-            val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
-            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
-                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
-            else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
-        }
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
-        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED)
+        viewModel.trashType.observe(viewLifecycleOwner, { trashType ->
+            binding.buildRouteButton.text =
+                if (Util.trashTypesForInstruction.contains(trashType)) "Инструкция" else "Маршрут"
+            binding.buildRouteButton.visibility = View.VISIBLE
+            binding.buildRouteButton.setOnClickListener {
+                findNavController().navigate(
+                    R.id.navigation_first_instruction,
+                    bundleOf(FirstInstructionFragment.TRASH_TYPE to trashType)
+//                    R.id.navigation_maps,
+//                    bundleOf(MapsFragment.TRASH_TYPE to trashType)
+                )
+            }
+        })
     }
 
     private fun addTrashTypesViews() {
@@ -116,14 +127,50 @@ class TrashTypesListFragment : Fragment() {
             viewToTrashType[view]?.let { trashType ->
                 textView.compoundDrawables.forEach {
                     if (it == bw) {
-                        viewModel.addTrashType(trashType)
+//                        viewModel.addTrashType(trashType)
+                        viewModel.setTrashType(trashType)
+                        makeOtherIconsNotSelected(view)
+//                        binding.trashTypes1.children.forEach { other ->
+//                            if (other != view && other !is Space) {
+//                                (other as TextView?)?.setCompoundDrawablesWithIntrinsicBounds(null, viewToNotSelectedToSelected[other]!!.first, null, null)
+//                            }
+//                        }
+//                        binding.trashTypes2.children.forEach { other ->
+//                            if (other != view && other !is Space) {
+//                                (other as TextView?)?.setCompoundDrawablesWithIntrinsicBounds(null, viewToNotSelectedToSelected[other]!!.first, null, null)
+//                            }
+//                        }
+//                        binding.trashTypes3.children.forEach { other ->
+//                            if (other != view && other !is Space) {
+//                                (other as TextView?)?.setCompoundDrawablesWithIntrinsicBounds(null, viewToNotSelectedToSelected[other]!!.first, null, null)
+//                            }
+//                        }
                         textView.setCompoundDrawablesWithIntrinsicBounds(null, colorful, null, null)
-                    } else if (it == colorful) {
-                        viewModel.removeTrashType(trashType)
-                        textView.setCompoundDrawablesWithIntrinsicBounds(null, bw, null, null)
                     }
+//                    else if (it == colorful) {
+////                        viewModel.removeTrashType(trashType)
+//                        textView.setCompoundDrawablesWithIntrinsicBounds(null, bw, null, null)
+//                    }
                 }
             }
+        }
+    }
+
+    private fun makeOtherIconsNotSelected(stayingSelected: View) {
+        makeOtherIconsNotSelected(binding.trashTypes1, stayingSelected)
+        makeOtherIconsNotSelected(binding.trashTypes2, stayingSelected)
+        makeOtherIconsNotSelected(binding.trashTypes3, stayingSelected)
+    }
+
+    private fun makeOtherIconsNotSelected(linearLayout: LinearLayout, stayingSelected: View) {
+        linearLayout.children.forEach {
+            if (it is TextView && it != stayingSelected)
+                it.setCompoundDrawablesWithIntrinsicBounds(
+                    null,
+                    viewToNotSelectedToSelected[it]!!.first,
+                    null,
+                    null
+                )
         }
     }
 }

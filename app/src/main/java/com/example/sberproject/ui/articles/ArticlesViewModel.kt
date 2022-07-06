@@ -4,12 +4,13 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.sberproject.Util
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ArticlesViewModel(
-    private val articlesApi: ArticlesApi
+    //private val articlesApi: ArticlesApi
 ) : ViewModel() {
     private val mutableArticles by lazy {
         MutableLiveData<MutableList<Article>>()
@@ -27,10 +28,11 @@ class ArticlesViewModel(
     }
 
     init {
-        viewModelScope.launch {
+        mutableArticles.value = Util.articles.toMutableList()
+        /*viewModelScope.launch {
             mutableArticles.value = mutableListOf()
             addArticles()
-        }
+        }*/
     }
 
     fun loadMoreArticles() {
@@ -40,8 +42,8 @@ class ArticlesViewModel(
     }
 
     private suspend fun addArticles() {
-        mutableArticles.value?.addAll(articlesApi.getArticles(page, time))
+        /*mutableArticles.value?.addAll(articlesApi.getArticles(page, time))
         page++
-        mutableArticles.value = mutableArticles.value
+        mutableArticles.value = mutableArticles.value*/
     }
 }

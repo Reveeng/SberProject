@@ -60,10 +60,25 @@
         <action
             android:id="@+id/action_navigation_first_instruction_to_navigation_maps"
             app:destination="@id/navigation_maps" />
+        <action
+            android:id="@+id/action_navigation_first_instruction_to_undefinedTrashTypeFragment"
+            app:destination="@id/undefinedTrashTypeFragment" />
     </fragment>
     <fragment
         android:id="@+id/fragment_debug_info"
         android:name="com.example.sberproject.fragment_debug_info"
         android:label="fragment_debug_info"
         tools:layout="@layout/fragment_debug_info" />
+    <fragment
+        android:id="@+id/undefinedTrashTypeFragment"
+        tools:layout="@layout/fragment_undefined_trash_type"
+        android:name="com.example.sberproject.view.fragments.UndefinedTrashTypeFragment"
+        android:label="UndefinedTrashTypeFragment" >
+        <action
+            android:id="@+id/action_undefinedTrashTypeFragment_to_navigation_maps"
+            app:destination="@id/navigation_maps" />
+        <action
+            android:id="@+id/action_undefinedTrashTypeFragment_to_navigation_first_instruction"
+            app:destination="@id/navigation_first_instruction" />
+    </fragment>
 </navigation>

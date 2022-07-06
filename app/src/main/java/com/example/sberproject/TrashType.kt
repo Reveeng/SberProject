@@ -3,7 +3,7 @@ package com.example.sberproject
 enum class TrashType {
     PAPER, PLASTIC, CLOTHES, APPLIANCES, GLASS, METAL, LAMPS, HAZARDOUS_WASTE, BATTERIES, TETRA_PACK, CAPS, TIRES, OTHER;
 
-    override fun toString(): String {
+    fun toStringUI(): String {
         return trashTypeToString[this] ?: throw Exception("Unknown trash type")
     }
 

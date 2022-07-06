@@ -20,12 +20,15 @@ import android.widget.RelativeLayout
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import com.example.sberproject.MainActivityCallback
 import com.example.sberproject.TrashType
 import com.example.sberproject.ui.map.MapsFragment
 import com.example.sberproject.ui.scan.BarcodeHandler
+import com.example.sberproject.view.fragments.FirstInstructionFragment
 import com.google.mlkit.vision.barcode.BarcodeScanner
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.common.InputImage
@@ -54,7 +57,8 @@ class ScannerFragment : Fragment() {
     //create barcode handler class
     private val barcodeHandler: BarcodeHandler = BarcodeHandler { bundle: Bundle ->
         requireActivity().runOnUiThread {
-            findNavController().navigate(R.id.fragment_debug_info, bundle)
+            findNavController().navigate(R.id.navigation_first_instruction, bundle)
+//            findNavController().navigate(R.id.fragment_debug_info, bundle)
         }
     }
 
@@ -241,6 +245,11 @@ class ScannerFragment : Fragment() {
             requireContext(),
             Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (activity as MainActivityCallback?)?.setActionBarTitle("Сканер")
     }
 
     companion object {

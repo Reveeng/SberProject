@@ -14,6 +14,7 @@ class MapsViewModelFactory(private val context: Context) : ViewModelProvider.Fac
             RecyclingPlacesDatabase.getDatabase(context).recyclingPlacesDao()
         )
         @Suppress("UNCHECKED_CAST")
-        return MapsViewModel(repository) as T
+        //return MapsViewModel(repository) as T
+        return MapsViewModel() as T
     }
 }

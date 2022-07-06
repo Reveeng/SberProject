@@ -33,12 +33,12 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 import com.google.maps.android.clustering.ClusterManager
+import kotlinx.coroutines.runBlocking
 import java.util.*
 
 
 class MapsFragment : Fragment(), OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener,
-    MapFragmentCallback {
+    GoogleMap.OnMarkerClickListener {
     companion object {
         const val TRASH_TYPE = "trash type"
 
@@ -66,6 +66,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+//        trashType = TrashType.PLASTIC
         arguments?.getSerializable(TRASH_TYPE)?.let {
             trashType = it as TrashType
         }
@@ -91,12 +92,27 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
         mapFragment?.getMapAsync(this)
-        trashType?.let {
-            viewModel.setTrashType(it)
-        }
 
         viewModel.recyclingPlaceToShow.observe(viewLifecycleOwner, {
             showInfoSheetAboutRecyclingPlace(it)
+        })
+
+        viewModel.clickOnCloseInfoSheet.observe(viewLifecycleOwner, {
+            it.getContentIfNotHandled()?.let {
+                clickOnCloseInfoSheet()
+            }
+        })
+
+        viewModel.clickOnBuildRoute.observe(viewLifecycleOwner, {
+            it.getContentIfNotHandled()?.let{ recyclingPlace ->
+                clickOnBuildRoute(recyclingPlace)
+            }
+        })
+
+        viewModel.resetRoute.observe(viewLifecycleOwner, {
+            it.getContentIfNotHandled()?.let{
+                resetRoute()
+            }
         })
     }
 
@@ -143,27 +159,25 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
                 clusterManager.clearItems()
                 recyclingPlaces.forEach {
                     clusterManager.addItem(RecyclingPlacesCluster(it))
-//                    val icon = if (Util.trashTypeToMarker.containsKey(it.trashTypes))
-//                        BitmapDescriptorFactory.fromResource(Util.trashTypeToMarker[it.trashTypes]!!)
-//                    else BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_MAGENTA)
-//                    Util.markerToRecyclingPlace[addMarker(MarkerOptions().position(it.coordinates).title(it.name).icon(icon))] =it
                 }
                 clusterManager.cluster()
             }
         })
 
-        viewModel.routeToRecyclingPlace.observe(viewLifecycleOwner, { (start, end) ->
-            routeLine?.remove()
-            GoogleDirection.withServerKey(getString(R.string.google_maps_key))
-                .from(start)
-                .to(end)
-                .execute(
-                    onDirectionSuccess = {
-                        it?.let {
-                            onDirectionSuccess(googleMap, it)
-                        }
-                    }
-                )
+        viewModel.routeToRecyclingPlace.observe(viewLifecycleOwner, {
+               /* it.getContentIfNotHandled()?.let{ */(start, end) ->
+                    routeLine?.remove()
+                    GoogleDirection.withServerKey(getString(R.string.google_maps_key))
+                        .from(start)
+                        .to(end)
+                        .execute(
+                            onDirectionSuccess = {
+                                it?.let {
+                                    onDirectionSuccess(googleMap, it)
+                                }
+                            }
+                        )
+               // }
         })
 
         googleMap.setOnMarkerClickListener(this)
@@ -187,17 +201,27 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
                         1
                     )[0].locality
 
-                    viewModel.setCity(city)
 
                     val current = LatLng(it.latitude, it.longitude)
+
+                    runBlocking {
+
+                        viewModel.setCity(city)
+
+                        trashType?.let {
+                            viewModel.setTrashType(it)
+                            viewModel.findNearbyRecyclingPlaceFromStart(current)
+                        }
+                    }
+
 
                     googleMap.run {
                         moveCamera(CameraUpdateFactory.zoomTo(12.0F))
                         moveCamera(CameraUpdateFactory.newLatLng(current))
                     }
-                    trashType?.let {
-                        viewModel.findNearbyRecyclingPlaceFromStart(current)
-                    }
+//                    trashType?.let {
+//                        viewModel.findNearbyRecyclingPlaceFromStart(current)
+//                    }
                 }
             }
         } else
@@ -242,7 +266,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    override fun clickOnBuildRoute(recyclingPlace: RecyclingPlace) {
+    private fun clickOnBuildRoute(recyclingPlace: RecyclingPlace) {
         if (ContextCompat.checkSelfPermission(
                 requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION
@@ -261,7 +285,14 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
             requestPermission()
     }
 
-    override fun clickOnCloseInfoSheet() {
+    private fun clickOnCloseInfoSheet() {
+        childFragmentManager.commit {
+            replace(R.id.trash_types_list, TrashTypesListFragment())
+        }
+    }
+
+    private fun resetRoute() {
+        routeLine?.remove()
         childFragmentManager.commit {
             replace(R.id.trash_types_list, TrashTypesListFragment())
         }

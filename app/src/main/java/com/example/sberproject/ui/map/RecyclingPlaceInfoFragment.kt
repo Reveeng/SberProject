@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import androidx.core.graphics.drawable.toDrawable
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.Util
 import com.example.sberproject.databinding.FragmentRecyclingPlaceInfoBinding
@@ -21,15 +22,20 @@ class RecyclingPlaceInfoFragment : Fragment() {
     private var _binding: FragmentRecyclingPlaceInfoBinding? = null
     private val binding get() = _binding!!
     private lateinit var recyclingPlace: RecyclingPlace
-    private var callback: MapFragmentCallback? = null
+//    private var callback: MapFragmentCallback? = null
+    private lateinit var viewModel: MapsViewModel
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        callback = parentFragment as MapFragmentCallback
+//        callback = parentFragment as MapFragmentCallback
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        viewModel = ViewModelProvider(
+            requireActivity(),
+            MapsViewModelFactory(requireContext())
+        ).get(MapsViewModel::class.java)
         arguments?.let {
             recyclingPlace = it.getSerializable(RECYCLING_PLACE) as RecyclingPlace
         }
@@ -41,6 +47,7 @@ class RecyclingPlaceInfoFragment : Fragment() {
     ): View {
         _binding = FragmentRecyclingPlaceInfoBinding.inflate(inflater, container, false)
         binding.name.text = recyclingPlace.name
+        binding.coordinates.text = recyclingPlace.coordinates.toString()
         binding.information.text = recyclingPlace.information
         binding.name.setOnClickListener {
             val bottomSheetBehavior = BottomSheetBehavior.from(binding.root.parent as View)
@@ -49,12 +56,29 @@ class RecyclingPlaceInfoFragment : Fragment() {
             else bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED)
         }
         binding.closeInfoSheet.setOnClickListener {
-            callback?.clickOnCloseInfoSheet()
+            viewModel.clickOnCloseInfoSheet()
         }
         binding.buildRouteButton.setOnClickListener {
-            callback?.clickOnBuildRoute(recyclingPlace)
+            viewModel.clickOnBuildRoute(recyclingPlace)
         }
         setTrashTypeIcons()
+
+        viewModel.buildRoute.observe(viewLifecycleOwner, {
+            it.getContentIfNotHandled()?.let {
+                binding.closeInfoSheet.visibility = View.GONE
+                binding.buildRouteButton.text = "Сбросить маршрут"
+                binding.buildRouteButton.setOnClickListener {
+                    viewModel.resetRoute()
+                }
+            }
+        })
+
+//        viewModel.resetRoute.observe(viewLifecycleOwner, {
+//            it.getContentIfNotHandled()?.let{
+//
+//            }
+//        })
+
         return binding.root
     }
 

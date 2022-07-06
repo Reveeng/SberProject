@@ -25,7 +25,8 @@ class ArticlesFragment : Fragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
-                return ArticlesViewModel(RetrofitClient.ARTICLES_SERVICE) as T
+                //return ArticlesViewModel(RetrofitClient.ARTICLES_SERVICE) as T
+                return ArticlesViewModel() as T
             }
         }).get(ArticlesViewModel::class.java)
     }
