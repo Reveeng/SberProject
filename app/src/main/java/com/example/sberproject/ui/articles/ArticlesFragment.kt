@@ -23,7 +23,7 @@ class ArticlesFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
-            override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 @Suppress("UNCHECKED_CAST")
                 //return ArticlesViewModel(RetrofitClient.ARTICLES_SERVICE) as T
                 return ArticlesViewModel() as T
@@ -48,11 +48,11 @@ class ArticlesFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.articles.observe(viewLifecycleOwner, { articles ->
+        viewModel.articles.observe(viewLifecycleOwner) { articles ->
             if (binding.recyclerView.adapter == null)
                 binding.recyclerView.adapter = ArticleAdapter(articles) { articleOnClick(it) }
             binding.recyclerView.adapter?.notifyItemRangeInserted(articles.size - 10, 10)
-        })
+        }
     }
 
     override fun onResume() {

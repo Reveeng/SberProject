@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_articles">
+    app:startDestination="@id/authenticationFragment">
 
     <fragment
         android:id="@+id/navigation_articles"
@@ -11,7 +11,7 @@
         tools:layout="@layout/fragment_articles" >
         <action
             android:id="@+id/action_navigation_lenta_to_navigation_account"
-            app:destination="@id/navigation_account" />
+            app:destination="@id/accountFragment" />
         <action
             android:id="@+id/action_navigation_lenta_to_navigation_setting2"
             app:destination="@id/navigation_setting" />
@@ -41,10 +41,6 @@
             android:id="@+id/action_navigation_scanner_to_fragment_debug_info"
             app:destination="@id/fragment_debug_info" />
     </fragment>
-    <fragment
-        android:id="@+id/navigation_account"
-        android:name="com.example.sberproject.view.fragments.AccountFragment"
-        tools:layout="@layout/fragment_account" />
     <fragment
         android:id="@+id/navigation_setting"
         android:name="com.example.sberproject.view.fragments.SettingFragment"
@@ -81,4 +77,22 @@
             android:id="@+id/action_undefinedTrashTypeFragment_to_navigation_first_instruction"
             app:destination="@id/navigation_first_instruction" />
     </fragment>
+    <fragment
+        android:id="@+id/authenticationFragment"
+        android:name="com.example.sberproject.authentication.AuthenticationFragment"
+        android:label="fragment_authentication"
+        tools:layout="@layout/fragment_authentication" >
+        <action
+            android:id="@+id/action_authenticationFragment_to_navigation_articles"
+            app:destination="@id/navigation_articles" />
+    </fragment>
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="com.example.sberproject.account.AccountFragment"
+        android:label="AccountFragment" >
+        <action
+            android:id="@+id/action_accountFragment_to_authenticationFragment"
+            app:destination="@id/authenticationFragment" />
+    </fragment>
+
 </navigation>

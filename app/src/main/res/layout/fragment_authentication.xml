@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".authentication.AuthenticationFragment"
+    android:orientation="vertical">
+
+<EditText
+    android:id="@+id/emailField"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:inputType="textEmailAddress"
+    android:autofillHints="email"
+    android:layout_marginTop="48dp"
+    android:hint="Email"
+    android:layout_marginStart="24dp"
+    android:layout_marginEnd="24dp"
+    android:imeOptions="flagForceAscii">
+</EditText>
+
+    <EditText
+        android:id="@+id/passwordField"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:inputType="textPassword"
+        android:autofillHints="пароль"
+        android:layout_marginTop="48dp"
+        android:hint="Пароль"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:imeOptions="flagForceAscii">
+    </EditText>
+
+    <EditText
+        android:id="@+id/confirmPasswordField"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:inputType="textPassword"
+        android:autofillHints="пароль"
+        android:layout_marginTop="48dp"
+        android:hint="Подтвердить пароль"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        android:imeOptions="flagForceAscii">
+    </EditText>
+
+    <Button
+        android:id="@+id/signUpButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Зарегистрироваться"
+        android:layout_marginTop="48dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"/>
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Войти"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp" />
+
+    <Button
+        android:id="@+id/continueButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Продолжить без регистрации"
+        android:layout_marginTop="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginEnd="24dp"
+        />
+
+</LinearLayout>
