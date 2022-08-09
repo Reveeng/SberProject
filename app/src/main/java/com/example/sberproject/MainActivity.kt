@@ -9,6 +9,11 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.example.sberproject.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import java.io.File
 
 class MainActivity : AppCompatActivity(), MainActivityCallback {
 
@@ -51,6 +56,12 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.navView.visibility = View.GONE
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
+
+        GlobalScope.launch {
+            val f = File("C:\\Users\\acer\\Downloads\\4356_big.jpg")
+            val u = Firebase.auth.currentUser
+            val r = RetrofitClient.NEURAL_NETWORK_API.detect(f, u!!.uid)
+        }
     }
 
     override fun onStart() {
