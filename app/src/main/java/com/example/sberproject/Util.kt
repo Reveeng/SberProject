@@ -2,71 +2,18 @@ package com.example.sberproject
 
 import com.example.sberproject.ui.articles.Article
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
 
 object Util {
-    val recyclingPlaces by lazy {
-        listOf(
-            RecyclingPlace(
-                "Предприятие комплексного решения проблем промышленных отходов, ЕМУП",
-                LatLng(56.83770976967497, 60.60828874594135),
-                setOf(
-                    TrashType.LAMPS,
-                    TrashType.BATTERIES,
-                    TrashType.HAZARDOUS_WASTE,
-                    TrashType.OTHER
-                )
-            ),
-            RecyclingPlace(
-                "Ново-Тихвинский женский монастырь",
-                LatLng(56.822700129595944, 60.59999966912793),
-                setOf(TrashType.PAPER, TrashType.CLOTHES, TrashType.OTHER)
-            ),
-            RecyclingPlace(
-                "#НЕМУЗЕЙМУСОРА",
-                LatLng(56.83990041333704, 60.5940305421064),
-                setOf(
-                    TrashType.PLASTIC,
-                    TrashType.PAPER,
-                    TrashType.CLOTHES,
-                    TrashType.GLASS,
-                    TrashType.METAL,
-                    TrashType.APPLIANCES,
-                    TrashType.TETRA_PACK,
-                    TrashType.CAPS,
-                    TrashType.OTHER
-                )
-            ),
-            RecyclingPlace(
-                "Экотранс",
-                LatLng(56.870451054508095, 60.64722042492072),
-                setOf(TrashType.PAPER, TrashType.PLASTIC, TrashType.METAL)
-            ),
-            RecyclingPlace(
-                "Love Republic",
-                LatLng(56.85297554287459, 60.55090837094209),
-                setOf(TrashType.CLOTHES)
-            ),
-            RecyclingPlace(
-                "Леруа Мерлен",
-                LatLng(56.8293143834812, 60.51606056909486),
-                setOf(TrashType.LAMPS, TrashType.BATTERIES)
-            ),
-            RecyclingPlace(
-                "Аккумуляторный мир",
-                LatLng(56.830657070261054, 60.632205642105994),
-                setOf(TrashType.HAZARDOUS_WASTE, TrashType.OTHER)
-            )
+    val trashTypesForInstruction by lazy {
+        setOf(TrashType.PLASTIC)
+    }
+
+    val cityNames by lazy {
+        mapOf(
+            "Екатеринбург" to "ekaterinburg",
+            "Москва" to "moscow"
         )
-    }
-
-    val trashTypeToRecyclerPlaces by lazy {
-        val result = TrashType.values().map { it to mutableListOf<RecyclingPlace>() }.toMap()
-        recyclingPlaces.map { rp -> rp.trashTypes.map { result[it]?.add(rp) } }
-        result
-    }
-
-    val recyclingPlaceToTrashTypes by lazy {
-        recyclingPlaces.map { it.name to it.trashTypes }.toMap()
     }
 
     val trashTypeToIcon by lazy {
@@ -90,7 +37,7 @@ object Util {
     val trashTypeToMarker by lazy {
         mapOf(
             setOf(TrashType.PAPER) to R.drawable.marker_1,
-            setOf(TrashType.GLASS) to R.drawable.marker_3,
+            setOf(TrashType.PLASTIC) to R.drawable.marker_3,
             setOf(TrashType.METAL) to R.drawable.marker_4,
             setOf(TrashType.CLOTHES) to R.drawable.marker_5,
             setOf(TrashType.OTHER) to R.drawable.marker_6,
@@ -127,8 +74,8 @@ object Util {
                 TrashType.CLOTHES,
                 TrashType.OTHER,
                 TrashType.APPLIANCES,
-                TrashType.CAPS,
-                TrashType.TIRES
+                TrashType.TETRA_PACK,
+                TrashType.CAPS
             ) to R.drawable.marker_1_2_3_4_5_6_10_11_12,
             setOf(
                 TrashType.PAPER,
@@ -137,8 +84,8 @@ object Util {
                 TrashType.METAL,
                 TrashType.CLOTHES,
                 TrashType.OTHER,
+                TrashType.BATTERIES,
                 TrashType.APPLIANCES,
-                TrashType.TETRA_PACK,
                 TrashType.CAPS
             ) to R.drawable.marker_1_2_3_4_5_6_8_10_12,
             setOf(TrashType.PAPER, TrashType.PLASTIC) to R.drawable.marker_1_3,
@@ -206,26 +153,103 @@ object Util {
         )
     }
 
+    val recyclingPlaces by lazy{
+        listOf(
+            RecyclingPlace(
+                "#НЕМУЗЕЙМУСОРА",
+                "",
+                LatLng(56.84007145449412, 60.59386779098514),
+                setOf(TrashType.PAPER,TrashType.GLASS,TrashType.PLASTIC,TrashType.METAL,TrashType.CLOTHES,TrashType.OTHER,TrashType.APPLIANCES,TrashType.TETRA_PACK,TrashType.CAPS)
+            ),
+            RecyclingPlace(
+                "Вещь добра",
+                "Возле ТЦ Европа стоит бокс Вещь добра, куда можно сдать одежду, обувь и сумки в любом состоянии.\r\nОбратите внимание, что не принимается нижнее белье, колготки, носки.\r\nБолее подробную информацию можно найти: https://vk.com/vesh.dobra, https://www.instagram.com/vesh.dobra/?hl=ru",
+                LatLng(56.83809000000008, 60.59507000000008),
+                setOf(TrashType.CLOTHES)
+            ),
+            RecyclingPlace(
+                "Книгообмен",
+                "Стеллаж для обмена книгами.",
+                LatLng(56.839519979823166, 60.598710011969644),
+                setOf(TrashType.PAPER)
+            ),
+            RecyclingPlace(
+                "Благомаркет",
+                "Магазин Благомаркет принимаем женские одежду, обувь, аксессуары в хорошем состоянии, чистые, желательно из актуальных коллекций. Важно, что эта одежда будет потом перепродаваться, поэтому просим тех, кто сдает нам вещи, задаться вопросом: «А отдала бы я это подруге?» Вырученные от продаж деньги передаются на благотворительность.\r\n\r\nПравила сдачи вещей:  http://blagomarket.store/resale\r\n\r\nИнстаграм: https://www.instagram.com/blagomarket/",
+                LatLng(56.845030000000065, 60.591710000000035),
+                setOf(TrashType.CLOTHES)
+            ),
+            RecyclingPlace(
+                "Бокс для сбора батареек в магазине Ель",
+                "2 этаж",
+                LatLng(56.8450242228236, 60.59060153961184),
+                setOf(TrashType.BATTERIES)
+            ),
+            RecyclingPlace(
+                "Вещь добра",
+                "В Дворце игровых видов спорта стоит бокс Вещь добра, куда можно сдать одежду, обувь и сумки в любом состоянии.\r\nОбратите внимание, что не принимается нижнее белье, колготки, носки.\r\nБолее подробную информацию можно найти: https://vk.com/vesh.dobra, https://www.instagram.com/vesh.dobra/?hl=ru",
+                LatLng(56.847660000000076, 60.597290000000044),
+                setOf(TrashType.CLOTHES)
+            )
+        )
+    }
+
     val articles by lazy {
         listOf(
             Article(
-                "https://www.ecodao.ru/what-is-ecology-adout/",
-                "О чём наука экология?",
-                "Интересно и просто расскажем, что такое экология и о чем эта наука?",
-                "https://lh5.googleusercontent.com/TbDj_27N-EsC6S2aLHtXh48AZlSVgUSHq4aPmyNgLo9M5J0KLXul8rLlypB7kqTTH87bYt-A6Rgp-Sln2a3SADCphSWRRndogi1YPEAzCQQ6Pd02__Ps-ubuOdLH-KBOKe9ReXc"
+                "https://ecowiki.ru/protivopozharnye-mery-chast-2/",
+                "Противопожарные меры: системные изменения для предотвращения пожаров. Часть 2",
+                "https://ecowiki.ru/wp-content/uploads/2021/09/image2-1.jpg"
             ),
             Article(
-                "https://trends.rbc.ru/trends/green/5d696a8c9a7947741b7e954d",
-                "Как сортировать мусор дома. Краткая инструкция",
-                "Расскажем, как ввести эту полезную привычку в повседневную жизнь",
-                "https://s0.rbk.ru/v6_top_pics/resized/590xH/media/img/7/03/755851506080037.png"
+                "https://ecowiki.ru/protivopozharnye-mery-chast-1/",
+                "Противопожарные меры: системные изменения для предотвращения пожаров. Часть 1",
+                "https://ecowiki.ru/wp-content/uploads/2021/09/image1-1.jpg"
             ),
             Article(
-                "https://nplus1.ru/material/2018/03/22/landfill-gases",
-                "Химическая жизнь мусора",
-                "Что происходит с отходами, когда они попадают на свалку?",
-                "https://nplus1.ru/images/2018/03/22/d8f0749839e914124c13c643c3321bb6.jpg"
+                "https://ecowiki.ru/osennij-konkurs-volonterskih-posadok-2021/",
+                "Осенний конкурс волонтерских посадок леса – 2021",
+                "https://ecowiki.ru/wp-content/uploads/2021/09/1DJI_0095.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/eko-znachit-ekonomiya-na-kakih-zelenyh-resheniyah-mozhet-vyigrat-restorannyj-biznes-chast-2/",
+                "Эко – значит «экономия». На каких «зеленых» решениях может выиграть ресторанный бизнес. Часть 2",
+                "https://ecowiki.ru/wp-content/uploads/2021/09/Veranda_Bjorn-4-.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/eko-znachit-ekonomiya-na-kakih-zelenyh-resheniyah-mozhet-vyigrat-restorannyj-biznes-chast-1/",
+                "Эко – значит «экономия». На каких «зеленых» решениях может выиграть ресторанный бизнес. Часть 1",
+                "https://ecowiki.ru/wp-content/uploads/2021/09/image1.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/luchshie-studencheskie-ekoproekty-rossii-chast-3/",
+                "Лучшие студенческие экопроекты России. Часть 3",
+                "https://ecowiki.ru/wp-content/uploads/2021/08/image16.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/luchshie-studencheskie-ekoproekty-rossii-chast-2/",
+                "Лучшие студенческие экопроекты России. Часть 2",
+                "https://ecowiki.ru/wp-content/uploads/2021/08/image17.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/kak-stat-zapovednym-volonterom/",
+                "Как стать «заповедным волонтером»",
+                "https://ecowiki.ru/wp-content/uploads/2021/08/image1-8.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/pozhary-v-yakutii-chem-mozhno-pomoch/",
+                "Пожары в Якутии: чем можно помочь?",
+                "https://ecowiki.ru/wp-content/uploads/2021/08/image1-7.jpg"
+            ),
+            Article(
+                "https://ecowiki.ru/kak-prozhit-uchebnyj-god-ekologichno/",
+                "Как прожить учебный год экологично",
+                "https://ecowiki.ru/wp-content/uploads/2021/08/blackboard-3651948.png"
             )
         )
+    }
+
+    val markerToRecyclingPlace by lazy {
+        mutableMapOf<Marker, RecyclingPlace>()
     }
 }

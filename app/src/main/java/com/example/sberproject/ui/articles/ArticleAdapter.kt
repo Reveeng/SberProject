@@ -7,7 +7,7 @@ import com.bumptech.glide.Glide
 import com.example.sberproject.databinding.ArticleItemBinding
 
 class ArticleAdapter(
-    private val articles: List<Article>,
+    private val articles: MutableList<Article>,
     private val onClick: (Article) -> Unit
 ) : RecyclerView.Adapter<ArticleAdapter.ArticleViewHolder>() {
     class ArticleViewHolder(
@@ -16,7 +16,6 @@ class ArticleAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
         fun bind(article: Article) {
             binding.articleTitle.text = article.title
-            binding.articleDescription.text = article.description
             Glide.with(binding.root)
                 .load(article.imageUrl)
                 .into(binding.articleImage)

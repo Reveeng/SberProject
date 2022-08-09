@@ -8,46 +8,63 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.sberproject.RecyclingPlace
 import com.example.sberproject.TrashType
+import com.example.sberproject.Util
+import com.example.sberproject.ui.map.data.RecyclingPlacesRepository
 import com.google.android.gms.maps.model.LatLng
 import kotlinx.coroutines.launch
 
 class MapsViewModel(
-    private val recyclingPlacesList: List<RecyclingPlace>
-//    private val recyclingPlacesApi: RecyclingPlacesApi
+    //private val repository: RecyclingPlacesRepository
 ) : ViewModel() {
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
     }
     val recyclingPlaces: LiveData<List<RecyclingPlace>> = mutableRecyclingPlaces
-    private val mutableRouteToNearbyRecyclingPlace by lazy {
+    private val mutableRouteToRecyclingPlace by lazy {
         MutableLiveData<Pair<LatLng, LatLng>>()
     }
-    val routeToNearbyRecyclingPlace: LiveData<Pair<LatLng, LatLng>> =
-        mutableRouteToNearbyRecyclingPlace
+    val routeToRecyclingPlace: LiveData<Pair<LatLng, LatLng>> =
+        mutableRouteToRecyclingPlace
+    private val mutableRecyclingPlaceInfoToShow by lazy {
+        MutableLiveData<RecyclingPlace>()
+    }
+    val recyclingPlaceToShow: LiveData<RecyclingPlace> = mutableRecyclingPlaceInfoToShow
 
-    init {
-//        viewModelScope.launch {
-//            mutableRecyclingPlaces.value = recyclingPlacesApi.getRecyclingPlaces()
-//        }
-        mutableRecyclingPlaces.value = recyclingPlacesList
+    private val trashTypes by lazy {
+        mutableSetOf<TrashType>()
     }
 
+    private val mutableBuildRoute by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val buildRoute: LiveData<Event<Int>> = mutableBuildRoute
+
+    private lateinit var recyclingPlacesList: List<RecyclingPlace>
+
     fun setSourceAndDestination(source: LatLng, destination: LatLng) {
-        mutableRouteToNearbyRecyclingPlace.value = source to destination
+        mutableBuildRoute.value = Event(0)
+        mutableRouteToRecyclingPlace.value = source to destination
     }
 
     fun findNearbyRecyclingPlaceFromStart(source: LatLng) {
         val nearbyRecyclingPlace = getNearbyRecyclingPlace(source)
         setSourceAndDestination(source, nearbyRecyclingPlace.coordinates)
+        mutableRecyclingPlaceInfoToShow.value = nearbyRecyclingPlace
     }
 
-    fun setTrashType(trashType: TrashType) {
-        mutableRecyclingPlaces.value =
-            recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
-    }
+//    private val mutableTrashType by lazy{
+//        MutableLiveData<Event<TrashType>>()
+//    }
+//    val trashType: LiveData<Event<TrashType>> = mutableTrashType
 
-    private val trashTypes by lazy {
-        mutableSetOf<TrashType>()
+    suspend fun setTrashType(trashType: TrashType) {
+
+//        this.trashType = trashType
+
+       // viewModelScope.launch {
+            mutableRecyclingPlaces.value =
+                recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+       // }
     }
 
     fun addTrashType(trashType: TrashType) {
@@ -93,5 +110,46 @@ class MapsViewModel(
             return it.first
         }
         throw Exception("There are no recycling places")
+    }
+
+    suspend fun setCity(city: String) {
+        //Util.cityNames[city]?.let {
+            //viewModelScope.launch {
+                //recyclingPlacesList = repository.getRecyclingPlaces(it)
+                recyclingPlacesList = Util.recyclingPlaces
+                mutableRecyclingPlaces.value = recyclingPlacesList
+//                trashType?.let {
+//                    mutableRecyclingPlaces.value =
+//                        recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+//                    findNearbyRecyclingPlaceFromStart(source)
+//                }
+           // }
+        //}
+    }
+
+    private val mutableClickOnCloseInfoSheet by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val clickOnCloseInfoSheet: LiveData<Event<Int>> = mutableClickOnCloseInfoSheet
+    private val mutableClickOnBuildRoute by lazy {
+        MutableLiveData<Event<RecyclingPlace>>()
+    }
+    val clickOnBuildRoute: LiveData<Event<RecyclingPlace>> = mutableClickOnBuildRoute
+    private val mutableResetRoute by lazy {
+        MutableLiveData<Event<Int>>()
+    }
+    val resetRoute: LiveData<Event<Int>> = mutableResetRoute
+
+    fun clickOnCloseInfoSheet() {
+        mutableClickOnCloseInfoSheet.value = Event(0)
+    }
+
+    fun clickOnBuildRoute(recyclingPlace: RecyclingPlace) {
+        mutableClickOnBuildRoute.value = Event(recyclingPlace)
+    }
+
+    fun resetRoute() {
+        mutableResetRoute.value = Event(0)
+        mutableRecyclingPlaces.value = recyclingPlacesList
     }
 }

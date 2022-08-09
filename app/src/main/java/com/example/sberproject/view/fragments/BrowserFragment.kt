@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.JavascriptInterface
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -48,6 +49,12 @@ class BrowserFragment : Fragment() {
                 return false
             }
         }
+//        binding.webView.addJavascriptInterface(object : Any(){
+//            @JavascriptInterface
+//            fun valid(){
+//
+//            }
+//        }, "btn")
         return binding.root
     }
 

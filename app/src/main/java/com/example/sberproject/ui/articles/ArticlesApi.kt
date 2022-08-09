@@ -1,9 +1,9 @@
 package com.example.sberproject.ui.articles
 
-import com.example.sberproject.ui.articles.Article
-import retrofit2.http.GET
+import retrofit2.http.*
 
 interface ArticlesApi {
-    @GET()
-    suspend fun getArticles(): List<Article>
+    @Headers("Content-Type: application/json")
+    @POST("{page}")
+    suspend fun getArticles(@Path("page") number: Int, @Body time: Time): List<Article>
 }

@@ -3,11 +3,30 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/egorn/AndroidStudioProjects/test/SberProject/app/src/main/res/layout/fragment_debug_info.xml" value="0.264" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/article_item.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_account.xml" value="0.33" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_articles.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_authentication.xml" value="0.2914046121593291" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_first_instruction.xml" value="0.358695652173913" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/default_dot.xml" value="0.12395833333333334" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.240625" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/round_settings_24.xml" value="0.12604166666666666" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/selected_dot.xml" value="0.240625" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/tab_selector.xml" value="0.240625" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_first_instruction.xml" value="0.1" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_image_slide.xml" value="0.10916919959473151" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_maps.xml" value="0.10989583333333333" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_recycling_place_info.xml" value="0.1" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_scanner.xml" value="0.1078125" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_text_slide.xml" value="0.1" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.25" />
+        <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_undefined_trash_type.xml" value="0.1" />
       </map>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

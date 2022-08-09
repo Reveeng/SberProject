@@ -1,6 +1,7 @@
 package com.example.sberproject.ui.scan
 
 import android.os.Bundle
+import com.example.sberproject.view.fragments.FirstInstructionFragment
 import com.google.mlkit.vision.barcode.Barcode
 import okhttp3.*
 import java.io.IOException
@@ -57,7 +58,8 @@ class BarcodeHandler(private val TTCallback:(bundle: Bundle)->Unit){
                 if (!response.isSuccessful) throw IOException("Unexpected code $response")
                 haveCodeInDb = true
                 val strResponse: String = response.body!!.string()
-                bundle.putString("info", strResponse)
+//                bundle.putString("info", strResponse)
+                bundle.putString(FirstInstructionFragment.BARCODE, barcode)
                 TTCallback(bundle)
             }
         })

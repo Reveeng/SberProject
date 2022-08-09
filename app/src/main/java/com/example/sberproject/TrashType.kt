@@ -3,7 +3,7 @@ package com.example.sberproject
 enum class TrashType {
     PAPER, PLASTIC, CLOTHES, APPLIANCES, GLASS, METAL, LAMPS, HAZARDOUS_WASTE, BATTERIES, TETRA_PACK, CAPS, TIRES, OTHER;
 
-    override fun toString(): String {
+    fun toStringUI(): String {
         return trashTypeToString[this] ?: throw Exception("Unknown trash type")
     }
 
@@ -25,6 +25,14 @@ enum class TrashType {
                 OTHER to "Иное"
             )
         }
+
+        private val stringToTrashType by lazy {
+            trashTypeToString.map { it.value to it.key }.toMap()
+        }
+
         fun fromInt(value: Int) = TrashType.values().first { it.ordinal == value }
+
+        fun fromString(value: String) =
+            stringToTrashType[value] ?: throw Exception("Unknown trash type")
     }
 }
