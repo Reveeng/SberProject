@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
 import com.google.gson.JsonElement
+import okhttp3.RequestBody
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.create
@@ -51,7 +52,7 @@ object RetrofitClient {
             .create(InstructionApi::class.java)
     }
 
-    val NEURAL_NETWORK_API: NeuralNetworkApi by lazy{
+    /*val NEURAL_NETWORK_API: NeuralNetworkApi by lazy{
         val gson = GsonBuilder().setLenient().create()
 
         Retrofit.Builder()
@@ -59,13 +60,13 @@ object RetrofitClient {
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
             .create(NeuralNetworkApi::class.java)
-    }
+    }*/
 }
 
-interface NeuralNetworkApi{
+/*interface NeuralNetworkApi{
     @Multipart
     @POST("detect")
-    suspend fun detect(@Part("files") file: File, @Part("uid") json: String): List<NeuralNetworkAnswer>
+    suspend fun detect(@Part("file") file: File, @Part("uid") json: String): List<NeuralNetworkAnswer>
 }
 
 data class NeuralNetworkAnswer(val cls: String, val box: List<Double>, val type: TrashType)
@@ -81,4 +82,4 @@ class NeuralNetworkAnswerDeserializer: JsonDeserializer<NeuralNetworkAnswer>{
         val type = TrashType.fromInt(json.asJsonObject.get("type").asInt)
         return NeuralNetworkAnswer(cls, box, type)
     }
-}
+}*/

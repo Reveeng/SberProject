@@ -38,7 +38,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class ScannerFragment : Fragment() {
+class ScannerFragment : Fragment() {/*
 
     //objects that need for scaner
     private var cameraSelector: CameraSelector? = null
@@ -258,4 +258,4 @@ class ScannerFragment : Fragment() {
         private const val RATIO_4_3_VALUE = 4.0 / 3.0
         private const val RATIO_16_9_VALUE = 16.0 / 9.0
     }
-}
+*/}

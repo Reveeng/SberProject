@@ -1,5 +1,10 @@
 package com.example.sberproject
 
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Picture
+import android.media.Image
+import android.net.Uri
 import android.opengl.Visibility
 import android.os.Bundle
 import android.view.View
@@ -7,13 +12,19 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
 import com.example.sberproject.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.objects.DetectedObject
+import com.google.mlkit.vision.objects.ObjectDetection
+import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import java.io.File
+import java.net.URI
 
 class MainActivity : AppCompatActivity(), MainActivityCallback {
 
@@ -57,11 +68,22 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
 
-        GlobalScope.launch {
-            val f = File("C:\\Users\\acer\\Downloads\\4356_big.jpg")
-            val u = Firebase.auth.currentUser
-            val r = RetrofitClient.NEURAL_NETWORK_API.detect(f, u!!.uid)
-        }
+        /*val options = ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .enableMultipleObjects()
+            .build()
+
+        val objectDetector = ObjectDetection.getClient(options)
+
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.tink)
+        val reses = mutableListOf<DetectedObject>()
+        val t = objectDetector.process(InputImage.fromBitmap(bitmap, 0))
+        t.addOnCompleteListener{
+            if(it.isSuccessful){
+                val r = it.result
+                r.forEach{x -> reses.add(x)}
+            }
+        }*/
     }
 
     override fun onStart() {
