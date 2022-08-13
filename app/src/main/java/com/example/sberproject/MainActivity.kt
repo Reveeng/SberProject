@@ -1,8 +1,7 @@
 package com.example.sberproject
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Picture
+import android.content.res.AssetManager
+import android.graphics.*
 import android.media.Image
 import android.net.Uri
 import android.opengl.Visibility
@@ -13,22 +12,57 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.example.sberproject.Keys.DIM_IMG_SIZE_X
+import com.example.sberproject.Keys.DIM_IMG_SIZE_Y
 import com.example.sberproject.databinding.ActivityMainBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import com.google.firebase.ml.modeldownloader.CustomModel
+import com.google.firebase.ml.modeldownloader.CustomModelDownloadConditions
+import com.google.firebase.ml.modeldownloader.DownloadType
+import com.google.firebase.ml.modeldownloader.FirebaseModelDownloader
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.io.File
+import org.tensorflow.lite.Interpreter
+import java.io.*
 import java.net.URI
+import java.nio.ByteBuffer
+import java.nio.ByteOrder
+import java.nio.MappedByteBuffer
+import java.nio.channels.FileChannel
+
+
+class Result(val id: String?, val title: String?, val confidence: Float?, private var location: RectF?) {
+    override fun toString(): String {
+        var resultString = ""
+        if (id != null) resultString += "[$id] "
+        if (title != null) resultString += title + " "
+        if (confidence != null) resultString += String.format("(%.1f%%) ", confidence * 100.0f)
+        if (location != null) resultString += location!!.toString() + " "
+        return resultString.trim { it <= ' ' }
+    }
+}
+
+object Keys {
+    const val MODEL_PATH = "mobilenet_quant_v1_224.tflite"
+    const val LABEL_PATH = "labels.txt"
+    const val INPUT_SIZE = 224
+    const val MAX_RESULTS = 3
+    const val DIM_BATCH_SIZE = 1
+    const val DIM_PIXEL_SIZE = 3
+    const val DIM_IMG_SIZE_X = 224
+    const val DIM_IMG_SIZE_Y = 224
+}
 
 class MainActivity : AppCompatActivity(), MainActivityCallback {
 
     private lateinit var binding: ActivityMainBinding
+    private var interpreter: Interpreter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,27 +102,53 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
 
-        /*val options = ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .enableMultipleObjects()
+        //val bitmap = BitmapFactory.decodeResource(resources, R.drawable.botle)
+        /*val conditions = CustomModelDownloadConditions.Builder()
+            .requireWifi()
             .build()
-
-        val objectDetector = ObjectDetection.getClient(options)
-
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.tink)
-        val reses = mutableListOf<DetectedObject>()
-        val t = objectDetector.process(InputImage.fromBitmap(bitmap, 0))
-        t.addOnCompleteListener{
-            if(it.isSuccessful){
-                val r = it.result
-                r.forEach{x -> reses.add(x)}
+        FirebaseModelDownloader.getInstance()
+            .getModel("Trash-Detector", DownloadType.LOCAL_MODEL, conditions)
+            .addOnCompleteListener {
+                val model = it.result
+                val modelFile = model?.file
+                if (modelFile != null) {
+                    interpreter = Interpreter(modelFile)
+                }
             }
+        val bm = BitmapFactory.decodeResource(resources, R.drawable.botle)
+        val bitmap = Bitmap.createScaledBitmap(bm, 224, 224, true)
+        val input = ByteBuffer.allocateDirect(224*224*3*4).order(ByteOrder.nativeOrder())
+        for (y in 0 until 224) {
+            for (x in 0 until 224) {
+                val px = bitmap.getPixel(x, y)
+                val r = Color.red(px)
+                val g = Color.green(px)
+                val b = Color.blue(px)
+                val rf = (r - 127) / 255f
+                val gf = (g - 127) / 255f
+                val bf = (b - 127) / 255f
+                input.putFloat(rf)
+                input.putFloat(gf)
+                input.putFloat(bf)
+            }
+        }
+        val bufferSize = 12 * java.lang.Float.SIZE / java.lang.Byte.SIZE
+        val modelOutput = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder())
+        interpreter?.run(input, modelOutput)
+        modelOutput.rewind()
+        val probabilities = modelOutput.asFloatBuffer()
+        try {
+            val reader = BufferedReader(
+                InputStreamReader(assets.open("custom_labels.txt"))
+            )
+            for (i in 0 until probabilities.capacity()) {
+                val label: String = reader.readLine()
+                val probability = probabilities.get(i)
+                println("$label: $probability")
+            }
+        } catch (e: IOException) {
+            // File not found?
         }*/
-    }
-
-    override fun onStart() {
-        super.onStart()
-
     }
 
     override fun setActionBarTitle(title: String) {
