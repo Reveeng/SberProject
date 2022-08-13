@@ -1,76 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".authentication.AuthenticationFragment"
     android:orientation="vertical">
 
-<EditText
-    android:id="@+id/emailField"
-    android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:inputType="textEmailAddress"
-    android:autofillHints="email"
-    android:layout_marginTop="48dp"
-    android:hint="Email"
-    android:layout_marginStart="24dp"
-    android:layout_marginEnd="24dp"
-    android:imeOptions="flagForceAscii">
-</EditText>
+    <EditText
+        android:id="@+id/emailField"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="200dp"
+        android:layout_marginEnd="50dp"
+        android:autofillHints="email"
+        android:background="@drawable/custom_input"
+        android:drawableStart="@drawable/ic_email"
+        android:drawablePadding="5dp"
+        android:padding="10dp"
+        android:hint="Email"
+        android:imeOptions="flagForceAscii"
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/passwordField"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:inputType="textPassword"
+        android:layout_below="@+id/emailField"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
         android:autofillHints="пароль"
-        android:layout_marginTop="48dp"
+        android:background="@drawable/custom_input"
+        android:drawableStart="@drawable/ic_lock"
+        android:drawablePadding="5dp"
         android:hint="Пароль"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:imeOptions="flagForceAscii">
-    </EditText>
-
-    <EditText
-        android:id="@+id/confirmPasswordField"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:imeOptions="flagForceAscii"
         android:inputType="textPassword"
-        android:autofillHints="пароль"
-        android:layout_marginTop="48dp"
-        android:hint="Подтвердить пароль"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:imeOptions="flagForceAscii">
-    </EditText>
+        android:padding="10dp" />
 
+<!--    <EditText-->
+<!--        android:id="@+id/confirmPasswordField"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="48dp"-->
+<!--        android:layout_below="@+id/passwordField"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:autofillHints="пароль"-->
+<!--        android:background="@drawable/custom_input"-->
+<!--        android:drawableStart="@drawable/ic_lock"-->
+<!--        android:drawablePadding="5dp"-->
+<!--        android:padding="10dp"-->
+<!--        android:hint="Подтвердить пароль"-->
+<!--        android:imeOptions="flagForceAscii"-->
+<!--        android:inputType="textPassword" />-->
     <Button
         android:id="@+id/signUpButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:layout_below="@+id/loginButton"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/custom_button_input"
         android:text="Зарегистрироваться"
-        android:layout_marginTop="48dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"/>
+        android:textColor="@android:color/black"
+    />
 
     <Button
         android:id="@+id/loginButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:layout_below="@+id/errText"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/custom_button_input"
         android:text="Войти"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp" />
+        android:textColor="@android:color/black"
+    />
 
     <Button
         android:id="@+id/continueButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="35dp"
+        android:layout_below="@+id/signUpButton"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/custom_button_input"
         android:text="Продолжить без регистрации"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        />
+        android:textColor="@android:color/black"
+    />
 
-</LinearLayout>
+    <EditText
+        android:id="@+id/errText"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_below="@+id/passwordField"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/err_text_back"
+        android:ems="10"
+        android:gravity="center_vertical"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        android:text="error text"
+        android:visibility="invisible"
+        android:textColor="@android:color/holo_red_light" />
+
+</RelativeLayout>
