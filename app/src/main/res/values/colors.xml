@@ -14,4 +14,6 @@
     <color name="colorButtonSlide">#EF600C</color>
     <color name="colorItemSelected">#1AA300</color>
     <color name="colorItemUnselected">#FFFFFF</color>
+    <color name="green">#46D173</color>
+    <color name="lightGreen">#5FFE92</color>
 </resources>

@@ -54,11 +54,11 @@ class AuthenticationFragment : Fragment() {
                 viewModel.setPassword(s.toString())
             }
         })
-        binding.confirmPasswordField.addTextChangedListener(object : FieldTextWatcher(){
+        /*binding.confirmPasswordField.addTextChangedListener(object : FieldTextWatcher(){
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 viewModel.setPasswordConfirm(s.toString())
             }
-        })
+        })*/
         return binding.root
     }
 
@@ -71,14 +71,14 @@ class AuthenticationFragment : Fragment() {
             findNavController().navigate(R.id.navigation_articles)
             (activity as MainActivityCallback?)?.login()
         }
-        viewModel.navigateToLogin.observe(viewLifecycleOwner) {
+        /*viewModel.navigateToLogin.observe(viewLifecycleOwner) {
             binding.confirmPasswordField.visibility = View.GONE
             (activity as MainActivityCallback?)?.setActionBarTitle("Вход")
         }
         viewModel.navigateToRegistration.observe(viewLifecycleOwner) {
             binding.confirmPasswordField.visibility = View.VISIBLE
             (activity as MainActivityCallback?)?.setActionBarTitle("Регистрация")
-        }
+        }*/
     }
 
     override fun onResume() {
