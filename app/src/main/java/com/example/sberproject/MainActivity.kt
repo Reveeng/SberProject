@@ -200,7 +200,13 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.navView.visibility = View.VISIBLE
         binding.accButton.visibility = View.VISIBLE
         binding.setButton.visibility = View.VISIBLE
-        binding.smt.setPadding(0, (56 * resources.displayMetrics.density + 0.5f).toInt(), 0, 0)
+        binding.smt.setPadding(
+            0,
+            (56 * resources.displayMetrics.density + 0.5f).toInt(),
+            0,
+            (56 * resources.displayMetrics.density + 0.5f).toInt()
+        )
+
     }
 
     override fun logout() {
