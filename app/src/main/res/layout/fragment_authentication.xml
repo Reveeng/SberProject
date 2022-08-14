@@ -3,112 +3,144 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".authentication.AuthenticationFragment"
-    android:orientation="vertical">
-
-    <EditText
-        android:id="@+id/emailField"
-        android:layout_width="match_parent"
-        android:layout_height="46dp"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="200dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="email"
-        android:background="@drawable/custom_input"
-        android:drawableStart="@drawable/ic_email"
-        android:drawablePadding="5dp"
-        android:hint="Email"
-        android:imeOptions="flagForceAscii"
-        android:inputType="textEmailAddress"
-        android:padding="10dp" />
-
-    <EditText
-        android:id="@+id/passwordField"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:layout_below="@+id/emailField"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="15dp"
-        android:layout_marginEnd="50dp"
-        android:autofillHints="пароль"
-        android:background="@drawable/custom_input"
-        android:drawableStart="@drawable/ic_lock"
-        android:drawablePadding="5dp"
-        android:hint="Пароль"
-        android:imeOptions="flagForceAscii"
-        android:inputType="textPassword"
-        android:padding="10dp" />
+    android:orientation="vertical"
+    >
 
 <!--    <EditText-->
-<!--        android:id="@+id/confirmPasswordField"-->
+<!--        android:id="@+id/emailField"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="46dp"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="200dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:autofillHints="email"-->
+<!--        android:background="@drawable/custom_input"-->
+<!--        android:drawableStart="@drawable/ic_email"-->
+<!--        android:drawablePadding="5dp"-->
+<!--        android:hint="Email"-->
+<!--        android:imeOptions="flagForceAscii"-->
+<!--        android:inputType="textEmailAddress"-->
+<!--        android:padding="10dp" />-->
+
+<!--    <EditText-->
+<!--        android:id="@+id/passwordField"-->
 <!--        android:layout_width="match_parent"-->
 <!--        android:layout_height="48dp"-->
-<!--        android:layout_below="@+id/passwordField"-->
+<!--        android:layout_below="@+id/emailField"-->
 <!--        android:layout_marginStart="50dp"-->
-<!--        android:layout_marginTop="20dp"-->
+<!--        android:layout_marginTop="15dp"-->
 <!--        android:layout_marginEnd="50dp"-->
 <!--        android:autofillHints="пароль"-->
 <!--        android:background="@drawable/custom_input"-->
 <!--        android:drawableStart="@drawable/ic_lock"-->
 <!--        android:drawablePadding="5dp"-->
-<!--        android:padding="10dp"-->
-<!--        android:hint="Подтвердить пароль"-->
+<!--        android:hint="Пароль"-->
 <!--        android:imeOptions="flagForceAscii"-->
-<!--        android:inputType="textPassword" />-->
-    <Button
-        android:id="@+id/signUpButton"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_below="@+id/loginButton"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/custom_button_input"
-        android:text="Зарегистрироваться"
-        android:textColor="@android:color/black"
-    />
+<!--        android:inputType="textPassword"-->
+<!--        android:padding="10dp" />-->
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_below="@+id/errText"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/custom_button_input"
-        android:text="Войти"
-        android:textColor="@android:color/black"
-    />
+<!--&lt;!&ndash;    <EditText&ndash;&gt;-->
+<!--&lt;!&ndash;        android:id="@+id/confirmPasswordField"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_width="match_parent"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_height="48dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_below="@+id/passwordField"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_marginStart="50dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_marginTop="20dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:layout_marginEnd="50dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:autofillHints="пароль"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:background="@drawable/custom_input"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:drawableStart="@drawable/ic_lock"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:drawablePadding="5dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:padding="10dp"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:hint="Подтвердить пароль"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:imeOptions="flagForceAscii"&ndash;&gt;-->
+<!--&lt;!&ndash;        android:inputType="textPassword" />&ndash;&gt;-->
+<!--    <Button-->
+<!--        android:id="@+id/signUpButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:layout_below="@+id/loginButton"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:background="@drawable/custom_button_input"-->
+<!--        android:text="Зарегистрироваться"-->
+<!--        android:textColor="@android:color/black"-->
+<!--    />-->
 
-    <Button
-        android:id="@+id/continueButton"
-        android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_below="@+id/signUpButton"
-        android:layout_marginStart="50dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="50dp"
-        android:background="@drawable/custom_button_input"
-        android:text="Продолжить без регистрации"
-        android:textColor="@android:color/black"
-    />
+<!--    <Button-->
+<!--        android:id="@+id/loginButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:layout_below="@+id/errText"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:background="@drawable/custom_button_input"-->
+<!--        android:text="Войти"-->
+<!--        android:textColor="@android:color/black"-->
+<!--    />-->
 
-    <EditText
-        android:id="@+id/errText"
+<!--    <Button-->
+<!--        android:id="@+id/continueButton"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:layout_below="@+id/signUpButton"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="10dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:background="@drawable/custom_button_input"-->
+<!--        android:text="Продолжить без регистрации"-->
+<!--        android:textColor="@android:color/black" />-->
+
+<!--    <EditText-->
+<!--        android:id="@+id/errText"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="35dp"-->
+<!--        android:layout_below="@+id/passwordField"-->
+<!--        android:layout_marginStart="50dp"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:layout_marginEnd="50dp"-->
+<!--        android:background="@drawable/err_text_back"-->
+<!--        android:ems="10"-->
+<!--        android:gravity="center_vertical"-->
+<!--        android:inputType="textPersonName"-->
+<!--        android:paddingLeft="15dp"-->
+<!--        android:text="error text"-->
+<!--        android:textColor="@android:color/holo_red_light"-->
+<!--        android:visibility="invisible" />-->
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/auth_tabs"
         android:layout_width="match_parent"
-        android:layout_height="35dp"
-        android:layout_below="@+id/passwordField"
+        android:layout_height="40dp"
         android:layout_marginStart="50dp"
-        android:layout_marginTop="4dp"
         android:layout_marginEnd="50dp"
-        android:background="@drawable/err_text_back"
-        android:ems="10"
-        android:gravity="center_vertical"
-        android:inputType="textPersonName"
-        android:paddingLeft="15dp"
-        android:text="error text"
-        android:visibility="invisible"
-        android:textColor="@android:color/holo_red_light" />
+        android:layout_marginTop="150dp"
+        app:tabGravity="center"
+    >
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Войти" />
+
+        <com.google.android.material.tabs.TabItem
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Регистрация" />
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/veiw_pager"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@+id/auth_tabs"
+        android:layout_alignParentBottom="true"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="0dp"
+        android:backgroundTint="@color/white" />
 
 </RelativeLayout>
