@@ -7,6 +7,7 @@ import android.net.Uri
 import android.opengl.Visibility
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -26,6 +27,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.objects.DetectedObject
 import com.google.mlkit.vision.objects.ObjectDetection
 import com.google.mlkit.vision.objects.defaults.ObjectDetectorOptions
+import com.google.mlkit.vision.objects.defaults.PredefinedCategory
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.tensorflow.lite.Interpreter
@@ -103,7 +105,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.setButton.visibility = View.GONE
 
         //val bitmap = BitmapFactory.decodeResource(resources, R.drawable.botle)
-        /*val conditions = CustomModelDownloadConditions.Builder()
+        val conditions = CustomModelDownloadConditions.Builder()
             .requireWifi()
             .build()
         FirebaseModelDownloader.getInstance()
@@ -115,7 +117,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
                     interpreter = Interpreter(modelFile)
                 }
             }
-        val bm = BitmapFactory.decodeResource(resources, R.drawable.botle)
+        val bm = BitmapFactory.decodeResource(resources, R.drawable.pepsi)
         val bitmap = Bitmap.createScaledBitmap(bm, 224, 224, true)
         val input = ByteBuffer.allocateDirect(224*224*3*4).order(ByteOrder.nativeOrder())
         for (y in 0 until 224) {
@@ -139,16 +141,36 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         val probabilities = modelOutput.asFloatBuffer()
         try {
             val reader = BufferedReader(
-                InputStreamReader(assets.open("custom_labels.txt"))
+                InputStreamReader(assets.open("labels.txt"))
             )
             for (i in 0 until probabilities.capacity()) {
                 val label: String = reader.readLine()
                 val probability = probabilities.get(i)
                 println("$label: $probability")
+                if (probability>0.0)
+                Toast.makeText(this, "$label: $probability", Toast.LENGTH_SHORT).show()
             }
         } catch (e: IOException) {
-            // File not found?
-        }*/
+            throw e
+        }
+
+
+        /*val options = ObjectDetectorOptions.Builder()
+            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
+            .enableMultipleObjects()
+            .enableClassification()  // Optional
+            .build()
+        val objectDetector = ObjectDetection.getClient(options)
+        val image = InputImage.fromBitmap(BitmapFactory.decodeResource(resources, R.drawable.shoes), 0)
+        objectDetector.process(image)
+            .addOnSuccessListener { detectedObjects ->
+                detectedObjects.forEach { detectedObject ->
+                    println("****************************************************************************************************************")
+                    detectedObject.labels.forEach {
+                        println(it.text)
+                    }
+                }
+            }*/
     }
 
     override fun setActionBarTitle(title: String) {
