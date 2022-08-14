@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.example.sberproject.MainActivityCallback
 import com.example.sberproject.R
-import com.example.sberproject.authentication.AuthenticationViewModel
+//import com.example.sberproject.authentication.AuthenticationViewModel
 import com.example.sberproject.databinding.FragmentAccountBinding
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase

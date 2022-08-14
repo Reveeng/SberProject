@@ -6,6 +6,7 @@ import android.media.Image
 import android.net.Uri
 import android.opengl.Visibility
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -39,7 +40,12 @@ import java.nio.MappedByteBuffer
 import java.nio.channels.FileChannel
 
 
-class Result(val id: String?, val title: String?, val confidence: Float?, private var location: RectF?) {
+class Result(
+    val id: String?,
+    val title: String?,
+    val confidence: Float?,
+    private var location: RectF?
+) {
     override fun toString(): String {
         var resultString = ""
         if (id != null) resultString += "[$id] "
@@ -89,6 +95,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
 
         //binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         setSupportActionBar(binding.toolbar)
+        binding.smt.setPadding(0, 0, 0, 0)
 
         binding.accButton.setOnClickListener {
             navController.navigate(R.id.accountFragment)
@@ -119,7 +126,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
             }
         val bm = BitmapFactory.decodeResource(resources, R.drawable.pepsi)
         val bitmap = Bitmap.createScaledBitmap(bm, 224, 224, true)
-        val input = ByteBuffer.allocateDirect(224*224*3*4).order(ByteOrder.nativeOrder())
+        val input = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
         for (y in 0 until 224) {
             for (x in 0 until 224) {
                 val px = bitmap.getPixel(x, y)
@@ -147,8 +154,8 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
                 val label: String = reader.readLine()
                 val probability = probabilities.get(i)
                 println("$label: $probability")
-                if (probability>0.0)
-                Toast.makeText(this, "$label: $probability", Toast.LENGTH_SHORT).show()
+                if (probability > 0.0)
+                    Toast.makeText(this, "$label: $probability", Toast.LENGTH_SHORT).show()
             }
         } catch (e: IOException) {
             throw e
@@ -193,11 +200,13 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.navView.visibility = View.VISIBLE
         binding.accButton.visibility = View.VISIBLE
         binding.setButton.visibility = View.VISIBLE
+        binding.smt.setPadding(0, (56 * resources.displayMetrics.density + 0.5f).toInt(), 0, 0)
     }
 
     override fun logout() {
         binding.navView.visibility = View.GONE
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
+        binding.smt.setPadding(0, 0, 0, 0)
     }
 }
