@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".authentication.AuthenticationFragment"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/emailField"
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="0dp"
+        android:layout_marginEnd="50dp"
+        android:autofillHints="email"
+        android:background="@drawable/custom_input"
+        android:drawableStart="@drawable/ic_email"
+        android:drawablePadding="5dp"
+        android:hint="Email"
+        android:imeOptions="flagForceAscii"
+        android:inputType="textEmailAddress"
+        android:padding="10dp" />
+
+    <EditText
+        android:id="@+id/passwordField"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/emailField"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
+        android:autofillHints="пароль"
+        android:background="@drawable/custom_input"
+        android:drawableStart="@drawable/ic_lock"
+        android:drawablePadding="5dp"
+        android:hint="Пароль"
+        android:imeOptions="flagForceAscii"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+    <EditText
+        android:id="@+id/passwordConfField"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_below="@+id/passwordField"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="50dp"
+        android:autofillHints="пароль"
+        android:background="@drawable/custom_input"
+        android:drawableStart="@drawable/ic_lock"
+        android:drawablePadding="5dp"
+        android:hint="Повторите пароль"
+        android:imeOptions="flagForceAscii"
+        android:inputType="textPassword"
+        android:padding="10dp" />
+
+    <TextView
+        android:id="@+id/errText"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:layout_below="@+id/passwordConfField"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/err_text_back"
+        android:ems="10"
+        android:gravity="center_vertical"
+        android:inputType="textPersonName"
+        android:paddingLeft="15dp"
+        android:text="error text"
+        android:textColor="@android:color/holo_red_light"
+        android:visibility="invisible" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_below="@+id/errText"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="50dp"
+        android:background="@drawable/custom_button_input"
+        android:text="Зарегистрироваться"
+        android:textColor="@android:color/black" />
+
+</RelativeLayout>
