@@ -111,19 +111,19 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
 
-        //val bitmap = BitmapFactory.decodeResource(resources, R.drawable.botle)
-        val conditions = CustomModelDownloadConditions.Builder()
-            .requireWifi()
-            .build()
-        FirebaseModelDownloader.getInstance()
-            .getModel("Trash-Detector", DownloadType.LOCAL_MODEL, conditions)
-            .addOnCompleteListener {
-                val model = it.result
-                val modelFile = model?.file
-                if (modelFile != null) {
-                    interpreter = Interpreter(modelFile)
-                }
-            }
+//        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.botle)
+//        val conditions = CustomModelDownloadConditions.Builder()
+//            .requireWifi()
+//            .build()
+//        FirebaseModelDownloader.getInstance()
+//            .getModel("Trash-Detector", DownloadType.LOCAL_MODEL, conditions)
+//            .addOnCompleteListener {
+//                val model = it.result
+//                val modelFile = model?.file
+//                if (modelFile != null) {
+//                    interpreter = Interpreter(modelFile)
+//                }
+//            }
         val bm = BitmapFactory.decodeResource(resources, R.drawable.pepsi)
         val bitmap = Bitmap.createScaledBitmap(bm, 224, 224, true)
         val input = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
@@ -161,23 +161,6 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
             throw e
         }
 
-
-        /*val options = ObjectDetectorOptions.Builder()
-            .setDetectorMode(ObjectDetectorOptions.SINGLE_IMAGE_MODE)
-            .enableMultipleObjects()
-            .enableClassification()  // Optional
-            .build()
-        val objectDetector = ObjectDetection.getClient(options)
-        val image = InputImage.fromBitmap(BitmapFactory.decodeResource(resources, R.drawable.shoes), 0)
-        objectDetector.process(image)
-            .addOnSuccessListener { detectedObjects ->
-                detectedObjects.forEach { detectedObject ->
-                    println("****************************************************************************************************************")
-                    detectedObject.labels.forEach {
-                        println(it.text)
-                    }
-                }
-            }*/
     }
 
     override fun setActionBarTitle(title: String) {

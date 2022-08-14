@@ -16,9 +16,10 @@
             android:id="@+id/logoBtn"
             android:layout_width="match_parent"
             android:layout_height="150dp"
-            android:background="@drawable/custom_button_input"
+            android:background="@drawable/custom_logo_background"
             android:clickable="false"
             android:text="Sortify"
+            android:textSize="24dp"
             android:fontFamily="@font/averiaserif"
             />
     </LinearLayout>
@@ -37,7 +38,7 @@
         app:tabGravity="center"
         app:tabMode="fixed"
         app:tabRippleColor="@null"
-        app:tabTextColor="@drawable/tab_text_selector">
+        app:tabTextColor="@color/black">
 
         <com.google.android.material.tabs.TabItem
             android:layout_width="match_parent"
