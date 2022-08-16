@@ -64,6 +64,7 @@
         <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_recycling_place_info.xml" value="0.25" />
         <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.25" />
         <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_undefined_trash_type.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/grid_view_layout_item.xml" value="0.2" />
       </map>
     </option>
   </component>
