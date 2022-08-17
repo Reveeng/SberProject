@@ -111,44 +111,31 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         binding.accButton.visibility = View.GONE
         binding.setButton.visibility = View.GONE
 
+        //val bitmap = BitmapFactory.decodeResource(resources, R.drawable.botle)
         val conditions = CustomModelDownloadConditions.Builder()
-            .requireWifi()  // Also possible: .requireCharging() and .requireDeviceIdle()
+            .requireWifi()
             .build()
         FirebaseModelDownloader.getInstance()
-            .getModel("Trash-Detector", DownloadType.LOCAL_MODEL_UPDATE_IN_BACKGROUND,
-                conditions)
-            .addOnSuccessListener { model: CustomModel? ->
-                // Download complete. Depending on your app, you could enable the ML
-                // feature, or switch from the local model to the remote model, etc.
-
-                // The CustomModel object contains the local path of the model file,
-                // which you can use to instantiate a TensorFlow Lite interpreter.
+            .getModel("Trash-Detector", DownloadType.LOCAL_MODEL, conditions)
+            .addOnCompleteListener {
+                val model = it.result
                 val modelFile = model?.file
                 if (modelFile != null) {
                     interpreter = Interpreter(modelFile)
                 }
             }
-
-        val a = 224
-        val bm = BitmapFactory.decodeResource(resources, R.drawable.botle)
-        val bitmap = Bitmap.createScaledBitmap(bm, a, a, true)
-        val input = ByteBuffer.allocateDirect(a*a*3*4).order(ByteOrder.nativeOrder())
-        for (y in 0 until a) {
-            for (x in 0 until a) {
+        val bm = BitmapFactory.decodeResource(resources, R.drawable.pepsi)
+        val bitmap = Bitmap.createScaledBitmap(bm, 224, 224, true)
+        val input = ByteBuffer.allocateDirect(224 * 224 * 3 * 4).order(ByteOrder.nativeOrder())
+        for (y in 0 until 224) {
+            for (x in 0 until 224) {
                 val px = bitmap.getPixel(x, y)
-
-                // Get channel values from the pixel value.
                 val r = Color.red(px)
                 val g = Color.green(px)
                 val b = Color.blue(px)
-
-                // Normalize channel values to [-1.0, 1.0]. This requirement depends on the model.
-                // For example, some models might require values to be normalized to the range
-                // [0.0, 1.0] instead.
                 val rf = (r - 127) / 255f
                 val gf = (g - 127) / 255f
                 val bf = (b - 127) / 255f
-
                 input.putFloat(rf)
                 input.putFloat(gf)
                 input.putFloat(bf)
@@ -161,23 +148,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
         val probabilities = modelOutput.asFloatBuffer()
         try {
             val reader = BufferedReader(
-                InputStreamReader(assets.open("labels.txt")))
-            for (i in 0 until probabilities.capacity()) {
-                val label: String = reader.readLine()
-                val probability = probabilities.get(i)
-                println("$label: $probability")
-            }
-        } catch (e: IOException) {
-            // File not found?
-        }
-        /*for (i in 0 until probabilities.capacity()) {
-            println(probabilities.get(i))
-            if (probabilities.get(i) > 0.0)
-                Toast.makeText(this, "$i: $probabilities.get(i)", Toast.LENGTH_SHORT).show()
-        }*/
-        /*try {
-            val reader = BufferedReader(
-                InputStreamReader(assets.open("temp_labels.txt"))
+                InputStreamReader(assets.open("labels.txt"))
             )
             for (i in 0 until probabilities.capacity()) {
                 val label: String = reader.readLine()
@@ -188,7 +159,7 @@ class MainActivity : AppCompatActivity(), MainActivityCallback {
             }
         } catch (e: IOException) {
             throw e
-        }*/
+        }
 
 
         /*val options = ObjectDetectorOptions.Builder()

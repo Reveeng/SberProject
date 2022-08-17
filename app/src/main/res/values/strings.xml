@@ -22,7 +22,7 @@
     <string name="press"><u>Нажми, чтобы посмотреть куда сдать</u></string>
     <string name="tw_text">Просканируйте qr-код</string>
     <string name="build_route_button">Маршрут</string>
-    <string name="trash_types_list_title">Выберите, что хотите сдать:</string>
+    <string name="trash_types_list_title">Выберите, что хотите сдать</string>
     <string name="forgot_pass">забыли <u>пароль?</u></string>
     <string name="enter_email">Введите почту</string>
     <string name="enter_pass">Введите пароль</string>

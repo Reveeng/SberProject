@@ -19,7 +19,7 @@ enum class TrashType {
                 LAMPS to "Лампочки",
                 HAZARDOUS_WASTE to "Опасные\nотходы",
                 BATTERIES to "Батарейки",
-                TETRA_PACK to "Тетра\nПак",
+                TETRA_PACK to "ТетраПак",
                 CAPS to "Крышечки",
                 TIRES to "Шины",
                 OTHER to "Иное"

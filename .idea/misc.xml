@@ -25,6 +25,47 @@
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_text_slide.xml" value="0.1" />
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.25" />
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/layout/fragment_undefined_trash_type.xml" value="0.1" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/baseline_account_circle_24.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/baseline_assignment_24.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/baseline_photo_camera_24.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/bell.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/custom_button_input.xml" value="0.2555" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/custom_input.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/custom_logo_background.xml" value="0.2545" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/default_dot.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_appliances.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_battery.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_clothes.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_dangerous.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_glass.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_lamp.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_metall.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_notifications_black_24dp.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_paper.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_plastic_botlle.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/ic_text_loc.xml" value="0.2555" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/key.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/news_border.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/news_border_pressed.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/round_settings_24.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/selected_dot.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/tab_background.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/tab_indicator.xml" value="0.2555" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/drawable/terms.xml" value="0.222" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/article_item.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_account.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_articles.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_authentication.xml" value="0.24139492753623187" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_browser.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_confirm_reg.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_debug_info.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_first_instruction.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_image_slide.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_maps.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_recycling_place_info.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/fragment_undefined_trash_type.xml" value="0.25" />
+        <entry key="..\:/projects/SberProject/app/src/main/res/layout/grid_view_layout_item.xml" value="0.2" />
       </map>
     </option>
   </component>
