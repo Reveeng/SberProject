@@ -4,13 +4,28 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/custom_button_input.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_baseline_vpn_key_24.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_battery.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_clothes.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_email.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_glass.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_lamp.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_launcher_background.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_paper.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_plastic_botlle.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_tetrapack.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/ic_tires.xml" value="0.322" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/drawable/language.xml" value="0.322" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/activity_main.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/article_item.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_account.xml" value="0.33" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_articles.xml" value="0.36666666666666664" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_authentication.xml" value="0.2914046121593291" />
         <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_first_instruction.xml" value="0.358695652173913" />
-        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.36666666666666664" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_trash_types_list.xml" value="0.351010101010101" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/fragment_undefined_trash_type.xml" value="0.18802083333333333" />
+        <entry key="..\:/Users/acer/Desktop/SberProject/app/src/main/res/layout/grid_view_layout_item.xml" value="0.67" />
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/default_dot.xml" value="0.12395833333333334" />
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/ic_baseline_account_circle_24.xml" value="0.240625" />
         <entry key="..\:/Users/user/Documents/Kotlin/SberProject/app/src/main/res/drawable/round_settings_24.xml" value="0.12604166666666666" />

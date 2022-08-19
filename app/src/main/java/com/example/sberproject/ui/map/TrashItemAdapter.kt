@@ -1,41 +1,50 @@
 package com.example.sberproject.ui.map
 
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.BaseAdapter
 import android.widget.ImageView
+import android.widget.ListAdapter
 import android.widget.TextView
+import androidx.cardview.widget.CardView
+import androidx.core.content.ContextCompat
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.sberproject.R
+import com.example.sberproject.TrashType
+import com.example.sberproject.Util
+import com.example.sberproject.databinding.GridViewLayoutItemBinding
 
-class TrashItemAdapter(var context: Context, var arrayList: ArrayList<TrashItem>) :
-    RecyclerView.Adapter<TrashItemAdapter.ItemHolder>() {
+class TrashItemAdapter(
+    var context: Context,
+    var arrayList: List<TrashType>,
+    private val onClick: (GridViewLayoutItemBinding, TrashType) -> Unit
+) :
+    BaseAdapter() {
+    override fun getCount(): Int = arrayList.size
 
+    override fun getItem(p0: Int): Any? = null
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemHolder {
-        val viewHolder = LayoutInflater.from(parent.context)
-            .inflate(R.layout.grid_view_layout_item, parent, false)
-        return ItemHolder(viewHolder)
-    }
+    override fun getItemId(p0: Int): Long = 0
 
-    override fun getItemCount(): Int {
-        return arrayList.size
-    }
-
-    override fun onBindViewHolder(holder: ItemHolder, position: Int) {
-
-        val trashItem: TrashItem = arrayList.get(position)
-
-        holder.icons.setImageResource(trashItem.icons!!)
-        holder.titles.text = trashItem.type
-
-    }
-
-    class ItemHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-
-        var icons = itemView.findViewById<ImageView>(R.id.icon_image_view)
-        var titles = itemView.findViewById<TextView>(R.id.title_text_view)
-
+    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
+        val binding = GridViewLayoutItemBinding.inflate(LayoutInflater.from(context), parent, false)
+        val trashType = arrayList[position]
+        binding.root.setOnClickListener {
+            onClick(binding, trashType)
+        }
+        binding.trashName.text = trashType.toStringUI()
+        binding.trashImage.setImageDrawable(
+            ContextCompat.getDrawable(
+                binding.root.context,
+                Util.trashTypeToIcon[trashType]!!
+            )
+        )
+        return binding.root
     }
 }

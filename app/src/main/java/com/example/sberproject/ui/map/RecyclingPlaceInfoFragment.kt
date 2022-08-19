@@ -22,7 +22,8 @@ class RecyclingPlaceInfoFragment : Fragment() {
     private var _binding: FragmentRecyclingPlaceInfoBinding? = null
     private val binding get() = _binding!!
     private lateinit var recyclingPlace: RecyclingPlace
-//    private var callback: MapFragmentCallback? = null
+
+    //    private var callback: MapFragmentCallback? = null
     private lateinit var viewModel: MapsViewModel
 
     override fun onAttach(context: Context) {
@@ -93,11 +94,7 @@ class RecyclingPlaceInfoFragment : Fragment() {
         recyclingPlace.trashTypes.forEach { trashType ->
             Util.trashTypeToIcon[trashType]?.let { r ->
                 val image = ImageView(requireContext())
-                val b = BitmapFactory.decodeResource(resources, r)
-                image.setImageDrawable(
-                    Bitmap.createBitmap(b, 0, 0, b.width, b.height / 2)
-                        .toDrawable(resources)
-                )
+                image.setImageResource(r)
                 val params = LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT

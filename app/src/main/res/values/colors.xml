@@ -18,4 +18,18 @@
     <color name="lightGreen">#5FFE92</color>
     <color name="appGreen">#3CD4A4</color>
     <color name="appGreenN">#228C6A</color>
+
+    <color name="paperColor">#568ecc</color>
+    <color name="glassColor">#68ba52</color>
+    <color name="plasticColor">#f78224</color>
+    <color name="metalColor">#fa6456</color>
+    <color name="clothesColor">#f358f1</color>
+    <color name="otherColor">#74eef2</color>
+    <color name="hazardousWasteColor">#3a3939</color>
+    <color name="batteriesColor">#c69745</color>
+    <color name="lampsColor">#984cff</color>
+    <color name="appliancesColor">#ba4b48</color>
+    <color name="tetrapackColor">#9cd7a3</color>
+    <color name="capsColor">#e0da24</color>
+    <color name="tiresColor">#3d0909</color>
 </resources>

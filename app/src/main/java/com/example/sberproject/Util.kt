@@ -16,21 +16,39 @@ object Util {
         )
     }
 
+    val trashTypeToColor by lazy {
+        mapOf(
+            TrashType.PAPER to R.color.paperColor,
+            TrashType.PLASTIC to R.color.plasticColor,
+            TrashType.CLOTHES to R.color.clothesColor,
+            TrashType.APPLIANCES to R.color.appliancesColor,
+            TrashType.GLASS to R.color.glassColor,
+            TrashType.METAL to R.color.metalColor,
+            TrashType.LAMPS to R.color.lampsColor,
+            TrashType.HAZARDOUS_WASTE to R.color.hazardousWasteColor,
+            TrashType.BATTERIES to R.color.batteriesColor,
+            TrashType.TETRA_PACK to R.color.tetrapackColor,
+            TrashType.CAPS to R.color.capsColor,
+            TrashType.TIRES to R.color.tiresColor,
+            TrashType.OTHER to R.color.otherColor
+        )
+    }
+
     val trashTypeToIcon by lazy {
         mapOf(
-            TrashType.PAPER to R.drawable.trash_1,
-            TrashType.PLASTIC to R.drawable.trash_3,
-            TrashType.CLOTHES to R.drawable.trash_5,
-            TrashType.APPLIANCES to R.drawable.trash_10,
-            TrashType.GLASS to R.drawable.trash_2,
-            TrashType.METAL to R.drawable.trash_4,
-            TrashType.LAMPS to R.drawable.trash_9,
-            TrashType.HAZARDOUS_WASTE to R.drawable.trash_7,
-            TrashType.BATTERIES to R.drawable.trash_8,
-            TrashType.TETRA_PACK to R.drawable.trash_11,
-            TrashType.CAPS to R.drawable.trash_12,
-            TrashType.TIRES to R.drawable.trash_13,
-            TrashType.OTHER to R.drawable.trash_6
+            TrashType.PAPER to R.drawable.ic_paper,
+            TrashType.PLASTIC to R.drawable.ic_plastic_botlle,
+            TrashType.CLOTHES to R.drawable.ic_clothes,
+            TrashType.APPLIANCES to R.drawable.ic_appliances,
+            TrashType.GLASS to R.drawable.ic_glass,
+            TrashType.METAL to R.drawable.ic_metall,
+            TrashType.LAMPS to R.drawable.ic_lamp,
+            TrashType.HAZARDOUS_WASTE to R.drawable.ic_dangerous,
+            TrashType.BATTERIES to R.drawable.ic_battery,
+            TrashType.TETRA_PACK to R.drawable.ic_tetrapack,
+            TrashType.CAPS to R.drawable.ic_paper, // TODO: Change
+            TrashType.TIRES to R.drawable.ic_tires,
+            TrashType.OTHER to R.drawable.ic_paper // TODO: Change
         )
     }
 
@@ -153,13 +171,23 @@ object Util {
         )
     }
 
-    val recyclingPlaces by lazy{
+    val recyclingPlaces by lazy {
         listOf(
             RecyclingPlace(
                 "#НЕМУЗЕЙМУСОРА",
                 "",
                 LatLng(56.84007145449412, 60.59386779098514),
-                setOf(TrashType.PAPER,TrashType.GLASS,TrashType.PLASTIC,TrashType.METAL,TrashType.CLOTHES,TrashType.OTHER,TrashType.APPLIANCES,TrashType.TETRA_PACK,TrashType.CAPS)
+                setOf(
+                    TrashType.PAPER,
+                    TrashType.GLASS,
+                    TrashType.PLASTIC,
+                    TrashType.METAL,
+                    TrashType.CLOTHES,
+                    TrashType.OTHER,
+                    TrashType.APPLIANCES,
+                    TrashType.TETRA_PACK,
+                    TrashType.CAPS
+                )
             ),
             RecyclingPlace(
                 "Вещь добра",
