@@ -23,6 +23,7 @@ import com.example.sberproject.databinding.GridViewLayoutItemBinding
 class TrashItemAdapter(
     var context: Context,
     var arrayList: List<TrashType>,
+    val invisibleIndex: Int,
     private val onClick: (GridViewLayoutItemBinding, TrashType) -> Unit
 ) :
     BaseAdapter() {
@@ -45,6 +46,8 @@ class TrashItemAdapter(
                 Util.trashTypeToIcon[trashType]!!
             )
         )
+        if (position == invisibleIndex)
+            binding.root.visibility = View.INVISIBLE
         return binding.root
     }
 }

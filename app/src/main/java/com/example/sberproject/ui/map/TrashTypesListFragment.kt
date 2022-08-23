@@ -40,9 +40,13 @@ class TrashTypesListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentTrashTypesListBinding.inflate(inflater, container, false)
+        val invisibleIndex = 10
+        val trashTypes = Util.trashTypeToIcon.map { it.key }.toMutableList()
+        trashTypes.add(invisibleIndex, TrashType.CAPS)
         binding.grid.adapter = TrashItemAdapter(
             requireContext(),
-            Util.trashTypeToIcon.map { it.key }.toList()
+            trashTypes,
+            invisibleIndex
         ) { binding, trashType ->
             if (checked.contains(trashType)) {
                 changeCardView(binding, Color.WHITE, Color.BLACK, Util.trashTypeToIcon[trashType]!!)
