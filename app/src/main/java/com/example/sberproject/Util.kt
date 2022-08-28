@@ -11,8 +11,7 @@ object Util {
 
     val cityNames by lazy {
         mapOf(
-            "Екатеринбург" to "ekaterinburg",
-            "Москва" to "moscow"
+            "Екатеринбург" to "ekaterinburg"
         )
     }
 
