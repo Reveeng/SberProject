@@ -11,6 +11,10 @@ import com.example.sberproject.TrashType
 import com.example.sberproject.Util
 import com.example.sberproject.ui.map.data.RecyclingPlacesRepository
 import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MapsViewModel(
@@ -61,10 +65,10 @@ class MapsViewModel(
 
 //        this.trashType = trashType
 
-       // viewModelScope.launch {
-            mutableRecyclingPlaces.value =
-                recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
-       // }
+        // viewModelScope.launch {
+        mutableRecyclingPlaces.value =
+            recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
+        // }
     }
 
     fun addTrashType(trashType: TrashType) {
@@ -114,16 +118,53 @@ class MapsViewModel(
 
     suspend fun setCity(city: String) {
         //Util.cityNames[city]?.let {
-            //viewModelScope.launch {
-                //recyclingPlacesList = repository.getRecyclingPlaces(it)
-                recyclingPlacesList = Util.recyclingPlaces
-                mutableRecyclingPlaces.value = recyclingPlacesList
+        //viewModelScope.launch {
+        //recyclingPlacesList = repository.getRecyclingPlaces(it)
+        //recyclingPlacesList = Util.recyclingPlaces
+
+        /*Util.cityNames[city]?.let { c ->
+            //mutableRecyclingPlaces.value = repository.getRecyclingPlaces(c)
+            repository.getThem(c).collect {
+                mutableRecyclingPlaces.value = it
+            }
+        }*/
+
+
+        Firebase.firestore.collection("cities")
+            .document("ekaterinburg")
+            .collection("places")
+            .get().addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val l = mutableListOf<RecyclingPlace>()
+                    it.result.documents.forEach { doc ->
+                        println(doc.id)
+                        val comment = doc["comment"] as String
+                        val name = doc["name"] as String
+                        val position = doc["position"] as GeoPoint
+                        val types = doc["types"] as ArrayList<Int>
+                        val rp = RecyclingPlace(
+                            name,
+                            comment,
+                            LatLng(position.latitude, position.longitude),
+                            types.map { x -> TrashType.fromInt(x) }.toSet()
+                        )
+                        l.add(rp)
+                    }
+                    recyclingPlacesList = l.toList()
+                    mutableRecyclingPlaces.value = recyclingPlacesList
+                } else {
+                    throw Exception()
+                }
+            }
+        /*recyclingPlacesList =
+        mutableRecyclingPlaces.value = recyclingPlacesList*/
+
 //                trashType?.let {
 //                    mutableRecyclingPlaces.value =
 //                        recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
 //                    findNearbyRecyclingPlaceFromStart(source)
 //                }
-           // }
+        // }
         //}
     }
 
