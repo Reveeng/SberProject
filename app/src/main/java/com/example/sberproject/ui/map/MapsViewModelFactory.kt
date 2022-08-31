@@ -10,11 +10,9 @@ import com.example.sberproject.ui.map.data.RecyclingPlacesRepository
 class MapsViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         val repository = RecyclingPlacesRepository(
-            RetrofitClient.RECYCLING_PLACES_SERVICE,
             RecyclingPlacesDatabase.getDatabase(context).recyclingPlacesDao()
         )
         @Suppress("UNCHECKED_CAST")
-        //return MapsViewModel(repository) as T
-        return MapsViewModel() as T
+        return MapsViewModel(repository) as T
     }
 }

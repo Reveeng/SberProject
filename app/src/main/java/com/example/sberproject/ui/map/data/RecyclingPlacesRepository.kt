@@ -1,51 +1,69 @@
 package com.example.sberproject.ui.map.data
 
+import android.util.Log
 import com.example.sberproject.RecyclingPlace
-import java.text.SimpleDateFormat
+import com.example.sberproject.TrashType
+import com.google.android.gms.maps.model.LatLng
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.GeoPoint
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import java.util.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.tasks.await
 
 class RecyclingPlacesRepository(
-    private val recyclingPlacesApi: RecyclingPlacesApi,
     private val recyclingPlacesDao: RecyclingPlacesDao
 ) {
-    suspend fun getRecyclingPlaces(city: String): List<RecyclingPlace> {
+    suspend fun getThem(city: String) = flow {
         val citiesWithRecyclingPlaces = recyclingPlacesDao.getCitiesWithRecyclingPlaces()
         val requiredCity = citiesWithRecyclingPlaces.firstOrNull { it.city.name == city }
-        val now = SimpleDateFormat(
-            "yyyy-MM-dd hh:mm:ss",
-            Locale.getDefault()
-        ).format(Calendar.getInstance().time)
-        requiredCity?.let { cityWithRecyclingPlace ->
-            val updates =
-                recyclingPlacesApi.getUpdates(city, cityWithRecyclingPlace.city.lastUpdate)
-            if (updates.isEmpty()) {
-                return cityWithRecyclingPlace.recyclingPlaces.map {
-                    RecyclingPlace(it.name, it.information, it.coordinates, it.trashTypes)
-                }
-            }
-            val lastUpdate = LastUpdate(now)
-            recyclingPlacesDao.deleteCityWithRecyclingPlaces(cityWithRecyclingPlace)
-            recyclingPlacesDao.insert(City(city, lastUpdate), updates.map {
+        val recyclingPlacesFromFirebase = mutableListOf<RecyclingPlace>()
+        val cityDocument = Firebase.firestore.collection("cities").document(city).get().await()
+        val lastFirebaseUpdate = (cityDocument["last_update"] as Timestamp).toDate()
+        requiredCity?.city?.lastUpdate?.let {
+            if (it.after(lastFirebaseUpdate))
+                emit(requiredCity.recyclingPlaces.map { x ->
+                    RecyclingPlace(
+                        x.name,
+                        x.information,
+                        x.coordinates,
+                        x.trashTypes
+                    )
+                })
+        }
+        requiredCity?.let {
+            recyclingPlacesDao.deleteCityWithRecyclingPlaces(it)
+        }
+        val placesCollection =
+            Firebase.firestore.collection("cities").document(city).collection("places").get()
+                .await()
+        placesCollection.documents.forEach { doc ->
+            val comment = doc["comment"] as String
+            val name = doc["name"] as String
+            val position = doc["position"] as GeoPoint
+            val types = doc["types"] as ArrayList<Int>
+            val recyclingPlace = RecyclingPlace(
+                name,
+                comment,
+                LatLng(position.latitude, position.longitude),
+                types.map { x -> TrashType.fromInt(x) }.toSet()
+            )
+            recyclingPlacesFromFirebase.add(recyclingPlace)
+        }
+        recyclingPlacesDao.insert(
+            City(city, lastFirebaseUpdate),
+            recyclingPlacesFromFirebase.map { x ->
                 RecyclingPlaceEntity(
-                    it.name,
-                    it.information,
-                    it.coordinates,
-                    it.trashTypes,
+                    x.name,
+                    x.information,
+                    x.coordinates,
+                    x.trashTypes,
                     city
                 )
             })
-            return updates
-        }
-        val recyclingPlacesFromServer = recyclingPlacesApi.getRecyclingPlaces(city)
-        recyclingPlacesDao.insert(City(city, LastUpdate(now)), recyclingPlacesFromServer.map {
-            RecyclingPlaceEntity(
-                it.name,
-                it.information,
-                it.coordinates,
-                it.trashTypes,
-                city
-            )
-        })
-        return recyclingPlacesFromServer
+        emit(recyclingPlacesFromFirebase)
     }
 }

@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 class MapsViewModel(
-    //private val repository: RecyclingPlacesRepository
+    private val repository: RecyclingPlacesRepository
 ) : ViewModel() {
     private val mutableRecyclingPlaces by lazy {
         MutableLiveData<List<RecyclingPlace>>()
@@ -117,55 +117,18 @@ class MapsViewModel(
     }
 
     suspend fun setCity(city: String) {
-        //Util.cityNames[city]?.let {
-        //viewModelScope.launch {
-        //recyclingPlacesList = repository.getRecyclingPlaces(it)
-        //recyclingPlacesList = Util.recyclingPlaces
-
-        /*Util.cityNames[city]?.let { c ->
-            //mutableRecyclingPlaces.value = repository.getRecyclingPlaces(c)
+        Util.cityNames[city]?.let { c ->
             repository.getThem(c).collect {
-                mutableRecyclingPlaces.value = it
-            }
-        }*/
-
-
-        Firebase.firestore.collection("cities")
-            .document("ekaterinburg")
-            .collection("places")
-            .get().addOnCompleteListener {
-                if (it.isSuccessful) {
-                    val l = mutableListOf<RecyclingPlace>()
-                    it.result.documents.forEach { doc ->
-                        println(doc.id)
-                        val comment = doc["comment"] as String
-                        val name = doc["name"] as String
-                        val position = doc["position"] as GeoPoint
-                        val types = doc["types"] as ArrayList<Int>
-                        val rp = RecyclingPlace(
-                            name,
-                            comment,
-                            LatLng(position.latitude, position.longitude),
-                            types.map { x -> TrashType.fromInt(x) }.toSet()
-                        )
-                        l.add(rp)
-                    }
-                    recyclingPlacesList = l.toList()
-                    mutableRecyclingPlaces.value = recyclingPlacesList
-                } else {
-                    throw Exception()
+                mutableRecyclingPlaces.value = it.map { x ->
+                    RecyclingPlace(
+                        x.name,
+                        x.information,
+                        x.coordinates,
+                        x.trashTypes
+                    )
                 }
             }
-        /*recyclingPlacesList =
-        mutableRecyclingPlaces.value = recyclingPlacesList*/
-
-//                trashType?.let {
-//                    mutableRecyclingPlaces.value =
-//                        recyclingPlacesList.filter { it.trashTypes.contains(trashType) }
-//                    findNearbyRecyclingPlaceFromStart(source)
-//                }
-        // }
-        //}
+        }
     }
 
     private val mutableClickOnCloseInfoSheet by lazy {
