@@ -127,6 +127,7 @@ class MapsViewModel(
                         x.trashTypes
                     )
                 }
+                recyclingPlacesList = it
             }
         }
     }
