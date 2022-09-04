@@ -45,9 +45,9 @@ object Util {
             TrashType.HAZARDOUS_WASTE to R.drawable.ic_dangerous,
             TrashType.BATTERIES to R.drawable.ic_battery,
             TrashType.TETRA_PACK to R.drawable.ic_tetrapack,
-            TrashType.CAPS to R.drawable.ic_paper, // TODO: Change
+            TrashType.CAPS to R.drawable.ic_cap,
             TrashType.TIRES to R.drawable.ic_tires,
-            TrashType.OTHER to R.drawable.ic_paper // TODO: Change
+            TrashType.OTHER to R.drawable.ic_other
         )
     }
 
