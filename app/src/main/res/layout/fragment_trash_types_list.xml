@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?attr/colorOnPrimary"
+    android:background="@drawable/custom_trashlist_bg_bord"
     android:orientation="vertical">
 
     <TextView
@@ -14,7 +14,7 @@
         android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
         android:textStyle="bold"
-        android:background="@drawable/custom_logo_background"
+        android:background="@drawable/custom_trashlist_bg"
         />
 
     <GridView
