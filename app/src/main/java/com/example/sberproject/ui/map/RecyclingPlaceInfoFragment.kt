@@ -64,15 +64,15 @@ class RecyclingPlaceInfoFragment : Fragment() {
         }
         setTrashTypeIcons()
 
-        viewModel.buildRoute.observe(viewLifecycleOwner, {
+        viewModel.buildRoute.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let {
                 binding.closeInfoSheet.visibility = View.GONE
-                binding.buildRouteButton.text = "Сбросить маршрут"
+//                binding.buildRouteButton.text = "Сбросить маршрут"
                 binding.buildRouteButton.setOnClickListener {
                     viewModel.resetRoute()
                 }
             }
-        })
+        }
 
 //        viewModel.resetRoute.observe(viewLifecycleOwner, {
 //            it.getContentIfNotHandled()?.let{
