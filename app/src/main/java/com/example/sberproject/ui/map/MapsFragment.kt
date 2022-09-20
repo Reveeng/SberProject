@@ -1,13 +1,20 @@
 package com.example.sberproject.ui.map
 
+
+import org.osmdroid.config.Configuration
+import org.osmdroid.config.Configuration.*
 import android.Manifest
 import android.content.pm.PackageManager
-import android.content.res.Configuration
+import android.content.pm.PackageManager.PERMISSION_GRANTED
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.Drawable
 import android.location.Geocoder
 import android.location.Location
 import android.os.Build
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -33,12 +40,25 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
 import com.google.android.gms.tasks.Task
 import com.google.maps.android.clustering.ClusterManager
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.osmdroid.bonuspack.routing.OSRMRoadManager
+import org.osmdroid.bonuspack.routing.RoadManager
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory
+import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.ItemizedIconOverlay
+import org.osmdroid.views.overlay.ItemizedOverlayWithFocus
+import org.osmdroid.views.overlay.Marker
+import org.osmdroid.views.overlay.OverlayItem
+import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
+import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import org.osmdroid.views.overlay.simplefastpoint.SimpleFastPointOverlay
 import java.util.*
 
 
-class MapsFragment : Fragment(), OnMapReadyCallback,
-    GoogleMap.OnMarkerClickListener {
+class MapsFragment : Fragment() {
     companion object {
         const val TRASH_TYPE = "trash type"
 
@@ -76,19 +96,96 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         ).get(MapsViewModel::class.java)
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
+        getInstance().load(
+            requireContext(),
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+        )
+        getInstance().userAgentValue = BuildConfig.APPLICATION_ID
+        binding.map.setTileSource(TileSourceFactory.MAPNIK)
+        binding.map.setMultiTouchControls(true);
+        val mapController = binding.map.controller
+        mapController.setZoom(14.0)
+        if (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PERMISSION_GRANTED
+        ) {
+            println("Location Permission GRANTED")
+            val locationOverlay =
+                MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), binding.map);
+            locationOverlay.enableMyLocation();
+            binding.map.overlays.add(locationOverlay)
+        } else {
+            println("Location Permission DENIED")
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
+                1
+            )
+        }
+        val startPoint = GeoPoint(56.86885040376578, 60.5573143561283)
+        mapController.setCenter(startPoint)
+        runBlocking { viewModel.setCity("Екатеринбург") }
+        viewModel.recyclingPlaces.observe(viewLifecycleOwner) {
+            binding.map.overlays.removeIf { x -> x is Marker}
+            it.forEach { rp ->
+                val marker = Marker(binding.map)
+                marker.position = GeoPoint(rp.coordinates.latitude, rp.coordinates.longitude)
+                Util.trashTypeToMarker[rp.trashTypes]?.let {
+                    marker.icon = ContextCompat.getDrawable(requireContext(), it)
+                }
+                marker.setOnMarkerClickListener { m, mv ->
+                    showInfoSheetAboutRecyclingPlace(rp)
+                    true
+                }
+                binding.map.overlays.add(marker)
+            }
+            /*val overlay = ItemizedOverlayWithFocus(items, object: ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
+                override fun onItemSingleTapUp(index:Int, item:OverlayItem):Boolean {
+                    //do something
+                    return true
+                }
+                override fun onItemLongPress(index:Int, item:OverlayItem):Boolean {
+                    return false
+                }
+            }, requireContext())
+            overlay.setFocusItemsOnTap(true);
+            currentOverlay = overlay
+            binding.map.overlays.add(overlay)*/
+            binding.map.invalidate()
+        }
+
+        val roadManager = OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
+        GlobalScope.launch {
+            val road = roadManager.getRoad(
+                arrayListOf(
+                    GeoPoint(56.86885040376578, 60.5573143561283),
+                    GeoPoint(56.839519979823166, 60.598710011969644)
+                )
+            )
+            val roadOverly = RoadManager.buildRoadOverlay(road)
+            binding.map.overlays.add(roadOverly)
+            binding.map.invalidate()
+        }
+        //viewModel.setRoad(roadManager, GeoPoint(56.86885040376578, 60.5573143561283), GeoPoint(56.839519979823166, 60.598710011969644))
+
+
         return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
+
+
+        /*val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
         mapFragment?.getMapAsync(this)
@@ -113,7 +210,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
             it.getContentIfNotHandled()?.let{
                 resetRoute()
             }
-        })
+        })*/
     }
 
     override fun onResume() {
@@ -133,7 +230,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         }
     }
 
-    override fun onMapReady(googleMap: GoogleMap) {
+    /*override fun onMapReady(googleMap: GoogleMap) {
         this.googleMap = googleMap
         enableMyLocation()
         googleMap.run {
@@ -181,7 +278,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         })
 
         googleMap.setOnMarkerClickListener(this)
-    }
+    }*/
 
     private fun enableMyLocation() {
         if (!::googleMap.isInitialized) return
@@ -253,12 +350,12 @@ class MapsFragment : Fragment(), OnMapReadyCallback,
         )
     }
 
-    override fun onMarkerClick(marker: Marker): Boolean {
+    /*override fun onMarkerClick(marker: Marker): Boolean {
         Util.markerToRecyclingPlace[marker]?.let {
             showInfoSheetAboutRecyclingPlace(it)
         }
         return true
-    }
+    }*/
 
     private fun showInfoSheetAboutRecyclingPlace(recyclingPlace: RecyclingPlace) {
         childFragmentManager.commit {

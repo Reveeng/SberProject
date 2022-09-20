@@ -101,4 +101,7 @@ dependencies {
     implementation 'me.relex:circleindicator:2.1.6'
 
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.0-native-mt'
+
+    implementation 'org.osmdroid:osmdroid-android:6.1.13'
+    implementation 'com.github.MKergall:osmbonuspack:6.9.0'
 }
