@@ -15,6 +15,7 @@ import android.location.Location
 import android.os.Build
 import android.os.Bundle
 import android.preference.PreferenceManager
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -44,6 +45,8 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.osmdroid.bonuspack.clustering.MarkerClusterer
+import org.osmdroid.bonuspack.clustering.RadiusMarkerClusterer
 import org.osmdroid.bonuspack.routing.OSRMRoadManager
 import org.osmdroid.bonuspack.routing.RoadManager
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
@@ -120,7 +123,9 @@ class MapsFragment : Fragment() {
             println("Location Permission GRANTED")
             val locationOverlay =
                 MyLocationNewOverlay(GpsMyLocationProvider(requireContext()), binding.map);
-            locationOverlay.enableMyLocation();
+            locationOverlay.enableMyLocation()
+            locationOverlay.enableFollowLocation()
+
             binding.map.overlays.add(locationOverlay)
         } else {
             println("Location Permission DENIED")
@@ -130,11 +135,11 @@ class MapsFragment : Fragment() {
                 1
             )
         }
-        val startPoint = GeoPoint(56.86885040376578, 60.5573143561283)
-        mapController.setCenter(startPoint)
         runBlocking { viewModel.setCity("Екатеринбург") }
         viewModel.recyclingPlaces.observe(viewLifecycleOwner) {
-            binding.map.overlays.removeIf { x -> x is Marker}
+            binding.map.overlays.removeIf { x -> x is RadiusMarkerClusterer }
+            val clusterer = RadiusMarkerClusterer(requireContext())
+            binding.map.overlays.add(clusterer)
             it.forEach { rp ->
                 val marker = Marker(binding.map)
                 marker.position = GeoPoint(rp.coordinates.latitude, rp.coordinates.longitude)
@@ -145,72 +150,54 @@ class MapsFragment : Fragment() {
                     showInfoSheetAboutRecyclingPlace(rp)
                     true
                 }
-                binding.map.overlays.add(marker)
+                clusterer.add(marker)
             }
-            /*val overlay = ItemizedOverlayWithFocus(items, object: ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
-                override fun onItemSingleTapUp(index:Int, item:OverlayItem):Boolean {
-                    //do something
-                    return true
-                }
-                override fun onItemLongPress(index:Int, item:OverlayItem):Boolean {
-                    return false
-                }
-            }, requireContext())
-            overlay.setFocusItemsOnTap(true);
-            currentOverlay = overlay
-            binding.map.overlays.add(overlay)*/
             binding.map.invalidate()
         }
 
-        val roadManager = OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
-        GlobalScope.launch {
-            val road = roadManager.getRoad(
-                arrayListOf(
-                    GeoPoint(56.86885040376578, 60.5573143561283),
-                    GeoPoint(56.839519979823166, 60.598710011969644)
+        viewModel.routeToRecyclingPlace.observe(viewLifecycleOwner) { (start, end) ->
+            binding.map.overlays.removeIf { x -> x is org.osmdroid.views.overlay.Polyline }
+            val roadManager = OSRMRoadManager(requireContext(), BuildConfig.APPLICATION_ID)
+            GlobalScope.launch {
+                val road = roadManager.getRoad(
+                    arrayListOf(
+                        GeoPoint(start.latitude, start.longitude),
+                        GeoPoint(end.latitude, end.longitude)
+                    )
                 )
-            )
-            val roadOverly = RoadManager.buildRoadOverlay(road)
-            binding.map.overlays.add(roadOverly)
-            binding.map.invalidate()
+                val roadOverly = RoadManager.buildRoadOverlay(road)
+                binding.map.overlays.add(roadOverly)
+                binding.map.invalidate()
+            }
         }
-        //viewModel.setRoad(roadManager, GeoPoint(56.86885040376578, 60.5573143561283), GeoPoint(56.839519979823166, 60.598710011969644))
 
+        viewModel.recyclingPlaceToShow.observe(viewLifecycleOwner) {
+            showInfoSheetAboutRecyclingPlace(it)
+        }
 
+        viewModel.clickOnCloseInfoSheet.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let {
+                clickOnCloseInfoSheet()
+            }
+        }
+
+        viewModel.clickOnBuildRoute.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { recyclingPlace ->
+                clickOnBuildRoute(recyclingPlace)
+            }
+        }
+
+        viewModel.resetRoute.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let {
+                resetRoute()
+            }
+        }
         return binding.root
     }
 
     @RequiresApi(Build.VERSION_CODES.P)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-
-        /*val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
-        fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireContext())
-        mapFragment?.getMapAsync(this)
-
-        viewModel.recyclingPlaceToShow.observe(viewLifecycleOwner, {
-            showInfoSheetAboutRecyclingPlace(it)
-        })
-
-        viewModel.clickOnCloseInfoSheet.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let {
-                clickOnCloseInfoSheet()
-            }
-        })
-
-        viewModel.clickOnBuildRoute.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let{ recyclingPlace ->
-                clickOnBuildRoute(recyclingPlace)
-            }
-        })
-
-        viewModel.resetRoute.observe(viewLifecycleOwner, {
-            it.getContentIfNotHandled()?.let{
-                resetRoute()
-            }
-        })*/
     }
 
     override fun onResume() {
@@ -228,101 +215,6 @@ class MapsFragment : Fragment() {
                 ), permissionId
             )
         }
-    }
-
-    /*override fun onMapReady(googleMap: GoogleMap) {
-        this.googleMap = googleMap
-        enableMyLocation()
-        googleMap.run {
-            clusterManager =
-                RecyclingPlacesClusterManager(requireActivity(), this) { onMarkerClick(it) }
-            clusterManager.renderer =
-                RecyclingPlacesClusterRender(requireActivity(), this, clusterManager)
-            setOnCameraIdleListener(clusterManager)
-            setOnMarkerClickListener(clusterManager)
-        }
-        val nightModeFlags = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
-        if (nightModeFlags == Configuration.UI_MODE_NIGHT_YES)
-            googleMap.setMapStyle(
-                MapStyleOptions.loadRawResourceStyle(
-                    requireContext(),
-                    R.raw.style_json
-                )
-            )
-
-        viewModel.recyclingPlaces.observe(viewLifecycleOwner, { recyclingPlaces ->
-            googleMap.run {
-                clear()
-                clusterManager.clearItems()
-                recyclingPlaces.forEach {
-                    clusterManager.addItem(RecyclingPlacesCluster(it))
-                }
-                clusterManager.cluster()
-            }
-        })
-
-        viewModel.routeToRecyclingPlace.observe(viewLifecycleOwner, {
-               /* it.getContentIfNotHandled()?.let{ */(start, end) ->
-                    routeLine?.remove()
-                    GoogleDirection.withServerKey(getString(R.string.google_maps_key))
-                        .from(start)
-                        .to(end)
-                        .execute(
-                            onDirectionSuccess = {
-                                it?.let {
-                                    onDirectionSuccess(googleMap, it)
-                                }
-                            }
-                        )
-               // }
-        })
-
-        googleMap.setOnMarkerClickListener(this)
-    }*/
-
-    private fun enableMyLocation() {
-        if (!::googleMap.isInitialized) return
-        if (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
-            == PackageManager.PERMISSION_GRANTED
-        ) {
-            googleMap.isMyLocationEnabled = true
-            val task: Task<Location> = fusedLocationProviderClient.lastLocation
-            task.addOnSuccessListener {
-                if (it != null) {
-                    val city = Geocoder(requireContext(), Locale.getDefault()).getFromLocation(
-                        it.latitude,
-                        it.longitude,
-                        1
-                    )[0].locality
-
-
-                    val current = LatLng(it.latitude, it.longitude)
-
-                    runBlocking {
-
-                        viewModel.setCity(city)
-
-                        trashType?.let {
-                            viewModel.setTrashType(it)
-                            viewModel.findNearbyRecyclingPlaceFromStart(current)
-                        }
-                    }
-
-
-                    googleMap.run {
-                        moveCamera(CameraUpdateFactory.zoomTo(12.0F))
-                        moveCamera(CameraUpdateFactory.newLatLng(current))
-                    }
-//                    trashType?.let {
-//                        viewModel.findNearbyRecyclingPlaceFromStart(current)
-//                    }
-                }
-            }
-        } else
-            requestPermission()
     }
 
     private fun onDirectionSuccess(googleMap: GoogleMap, direction: Direction) {
@@ -350,13 +242,6 @@ class MapsFragment : Fragment() {
         )
     }
 
-    /*override fun onMarkerClick(marker: Marker): Boolean {
-        Util.markerToRecyclingPlace[marker]?.let {
-            showInfoSheetAboutRecyclingPlace(it)
-        }
-        return true
-    }*/
-
     private fun showInfoSheetAboutRecyclingPlace(recyclingPlace: RecyclingPlace) {
         childFragmentManager.commit {
             replace(R.id.trash_types_list, RecyclingPlaceInfoFragment.newInstance(recyclingPlace))
@@ -370,13 +255,11 @@ class MapsFragment : Fragment() {
             )
             == PackageManager.PERMISSION_GRANTED
         ) {
-            googleMap.isMyLocationEnabled = true
-            val task: Task<Location> = fusedLocationProviderClient.lastLocation
-            task.addOnSuccessListener {
-                if (it != null) {
-                    val current = LatLng(it.latitude, it.longitude)
-                    viewModel.setSourceAndDestination(current, recyclingPlace.coordinates)
-                }
+            val overlay = binding.map.overlays.find { it is MyLocationNewOverlay }
+            overlay?.let {
+                val myLocation = it as MyLocationNewOverlay
+                val start = LatLng(myLocation.lastFix.latitude, myLocation.lastFix.longitude)
+                viewModel.setSourceAndDestination(start, recyclingPlace.coordinates)
             }
         } else
             requestPermission()
