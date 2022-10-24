@@ -83,8 +83,6 @@ class MapsFragment : Fragment() {
 
     private var permissionId = 52
 
-    private var routeLine: Polyline? = null
-
     private lateinit var clusterManager: ClusterManager<RecyclingPlacesCluster>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -217,19 +215,6 @@ class MapsFragment : Fragment() {
         }
     }
 
-    private fun onDirectionSuccess(googleMap: GoogleMap, direction: Direction) {
-        val route = direction.routeList[0]
-        val directionPositionList = route.legList[0].directionPoint
-        val line = DirectionConverter.createPolyline(
-            requireContext(),
-            directionPositionList,
-            10,
-            Color.parseColor("#aed6f5")
-        )
-        routeLine = googleMap.addPolyline(line)
-        setCameraWithCoordinationBounds(googleMap, route)
-    }
-
     private fun setCameraWithCoordinationBounds(googleMap: GoogleMap, route: Route) {
         val southwest = route.bound.southwestCoordination.coordination
         val northeast = route.bound.northeastCoordination.coordination
@@ -271,8 +256,9 @@ class MapsFragment : Fragment() {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.N)
     private fun resetRoute() {
-        routeLine?.remove()
+        binding.map.overlays.removeIf { x -> x is org.osmdroid.views.overlay.Polyline }
         childFragmentManager.commit {
             replace(R.id.trash_types_list, TrashTypesListFragment())
         }
